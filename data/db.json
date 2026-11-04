@@ -340,10 +340,10 @@
         }
       ],
       "status": "active",
-      "comments": false,
-      "issue": null,
+      "comments": true,
+      "issue": 12,
       "created": "2026-11-03T10:00:00.000Z",
-      "updated": "2026-11-03T10:00:00.000Z"
+      "updated": "2026-11-04T17:03:53.985Z"
     },
     {
       "id": "jolion-2023",
