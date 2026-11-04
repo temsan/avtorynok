@@ -2,116 +2,143 @@
 <html lang="ru">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Авторынок — объявления о продаже автомобилей</title>
-<meta name="description" content="Авторынок: бесплатная площадка объявлений о продаже автомобилей. Поиск по марке, цене, году и пробегу.">
+<meta name="description" content="Авторынок: площадка объявлений о продаже автомобилей от владельцев. Фото, характеристики, сравнение, расчёт кредита.">
+<meta name="theme-color" content="#0e0e10">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23ff5a1f'/%3E%3Cpath d='M7 19l2.5-6h13l2.5 6v4H7z' fill='%23fff'/%3E%3Ccircle cx='11' cy='23' r='2.5' fill='%23161616'/%3E%3Ccircle cx='21' cy='23' r='2.5' fill='%23161616'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700;800&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
 <header class="top">
   <div class="wrap top__in">
-    <a class="logo" href="#" data-nav="catalog"><span class="logo__mark">А</span><span>Авто<b>рынок</b></span></a>
+    <a class="logo" href="#/"><span class="logo__mark">А</span><span class="logo__word">Авто<b>рынок</b></span></a>
     <nav class="top__nav">
-      <a href="#" data-nav="catalog">Каталог</a>
-      <a href="#" data-nav="favs">Избранное <span class="badge" id="favCount">0</span></a>
-      <a href="#" class="btn btn--accent" data-nav="sell">+ Продать авто</a>
+      <a href="#/" data-nav="catalog">Каталог</a>
+      <a href="#/compare" data-nav="compare" class="icon-link" title="Сравнение"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4v16M17 4v16M3 8h8M13 16h8"/></svg><span class="lbl">Сравнение</span> <span class="badge" id="cmpCount">0</span></a>
+      <a href="#/favs" data-nav="favs" class="icon-link" title="Избранное"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/></svg><span class="lbl">Избранное</span> <span class="badge" id="favCount">0</span></a>
+      <a href="#/sell" data-nav="sell" class="btn btn--accent btn--sm">Продать<span class="lbl">&nbsp;авто</span></a>
     </nav>
   </div>
 </header>
 
-<main>
+<main id="main">
+  <!-- Каталог -->
   <section id="view-catalog" class="view">
     <div class="hero">
-      <div class="wrap">
-        <h1>Машины от владельцев.<br><span>Без посредников и комиссий.</span></h1>
-        <form class="search" id="quickSearch" autocomplete="off">
-          <input type="search" id="q" placeholder="Марка, модель или город — например, «Camry Казань»">
-          <button class="btn btn--accent" type="submit">Найти</button>
-        </form>
-        <div class="hero__stats" id="stats"></div>
+      <div class="wrap hero__in">
+        <div class="hero__text">
+          <p class="eyebrow">Объявления от владельцев</p>
+          <h1>Найдите машину,<br>которая <em>ваша</em></h1>
+          <form class="finder" id="finder" autocomplete="off">
+            <label><span>Марка</span><select id="h-brand"><option value="">Все марки</option></select></label>
+            <label><span>Модель</span><select id="h-model" disabled><option value="">Все модели</option></select></label>
+            <label><span>Цена до, ₽</span><input type="number" id="h-pmax" inputmode="numeric" step="50000" placeholder="Любая"></label>
+            <button class="btn btn--accent finder__go" type="submit" id="h-go">Показать</button>
+          </form>
+          <div class="hero__stats" id="stats"></div>
+        </div>
+        <a class="hero__feature" id="feature" href="#/"></a>
       </div>
     </div>
 
-    <div class="wrap layout">
-      <aside class="filters" id="filters">
-        <div class="filters__head">
-          <h2>Фильтры</h2>
-          <button type="button" class="link" id="resetFilters">Сбросить</button>
-        </div>
-        <label>Марка
-          <select id="f-brand"><option value="">Любая</option></select>
-        </label>
-        <div class="row2">
-          <label>Цена от, ₽<input type="number" id="f-pmin" min="0" step="10000" inputmode="numeric"></label>
-          <label>до, ₽<input type="number" id="f-pmax" min="0" step="10000" inputmode="numeric"></label>
-        </div>
-        <div class="row2">
-          <label>Год от<input type="number" id="f-ymin" min="1950" max="2027" inputmode="numeric"></label>
-          <label>до<input type="number" id="f-ymax" min="1950" max="2027" inputmode="numeric"></label>
-        </div>
-        <label>Пробег до, км<input type="number" id="f-km" min="0" step="5000" inputmode="numeric"></label>
-        <fieldset>
-          <legend>Коробка</legend>
-          <div class="chips" id="f-trans"></div>
-        </fieldset>
-        <fieldset>
-          <legend>Двигатель</legend>
-          <div class="chips" id="f-fuel"></div>
-        </fieldset>
-        <fieldset>
-          <legend>Кузов</legend>
-          <div class="chips" id="f-body"></div>
-        </fieldset>
-        <label>Город
-          <select id="f-city"><option value="">Любой</option></select>
-        </label>
-      </aside>
+    <div class="wrap">
+      <div class="bodies" id="bodies" role="group" aria-label="Тип кузова"></div>
+      <div class="brands" id="brands"></div>
 
-      <section class="results">
-        <div class="results__bar">
-          <button type="button" class="btn btn--ghost filters-toggle" id="filtersToggle">Фильтры</button>
-          <p id="count"></p>
-          <select id="sort" aria-label="Сортировка">
-            <option value="new">Сначала новые объявления</option>
-            <option value="cheap">Сначала дешёвые</option>
-            <option value="expensive">Сначала дорогие</option>
-            <option value="year">Сначала свежие по году</option>
-            <option value="km">Меньший пробег</option>
-          </select>
-        </div>
-        <div class="grid" id="grid"></div>
-        <div class="empty" id="empty" hidden>
-          <p>Ничего не нашлось. Попробуйте ослабить фильтры.</p>
-        </div>
-      </section>
+      <div class="recent" id="recentBox" hidden>
+        <div class="sec-head"><h2>Вы смотрели</h2><button class="link" type="button" id="recentClear">Очистить</button></div>
+        <div class="strip" id="recent"></div>
+      </div>
+
+      <div class="layout">
+        <aside class="filters" id="filters">
+          <div class="filters__head">
+            <h2>Фильтры</h2>
+            <button type="button" class="link" id="resetFilters">Сбросить</button>
+          </div>
+          <label>Поиск<input type="search" id="q" placeholder="Модель, город, цвет…"></label>
+          <label>Марка<select id="f-brand"><option value="">Любая</option></select></label>
+          <label>Модель<select id="f-model" disabled><option value="">Любая</option></select></label>
+          <div class="row2">
+            <label>Цена от<input type="number" id="f-pmin" min="0" step="50000" inputmode="numeric" placeholder="₽"></label>
+            <label>до<input type="number" id="f-pmax" min="0" step="50000" inputmode="numeric" placeholder="₽"></label>
+          </div>
+          <div class="row2">
+            <label>Год от<input type="number" id="f-ymin" min="1950" max="2027" inputmode="numeric"></label>
+            <label>до<input type="number" id="f-ymax" min="1950" max="2027" inputmode="numeric"></label>
+          </div>
+          <label>Пробег до, км<input type="number" id="f-km" min="0" step="10000" inputmode="numeric"></label>
+          <fieldset><legend>Коробка</legend><div class="chips" id="f-trans"></div></fieldset>
+          <fieldset><legend>Двигатель</legend><div class="chips" id="f-fuel"></div></fieldset>
+          <fieldset><legend>Привод</legend><div class="chips" id="f-drive"></div></fieldset>
+          <label>Город<select id="f-city"><option value="">Любой</option></select></label>
+          <label class="check"><input type="checkbox" id="f-sold"> Показывать проданные</label>
+          <button class="btn btn--accent filters__apply" type="button" id="filtersApply">Показать</button>
+        </aside>
+
+        <section class="results" id="results">
+          <div class="results__bar">
+            <button type="button" class="btn btn--ghost btn--sm filters-toggle" id="filtersToggle"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M7 12h10M10 18h4"/></svg>Фильтры <span class="badge badge--accent" id="fCount" hidden></span></button>
+            <p id="count"></p>
+            <div class="active-filters" id="activeFilters"></div>
+            <select id="sort" aria-label="Сортировка">
+              <option value="new">Сначала свежие объявления</option>
+              <option value="cheap">Сначала дешевле</option>
+              <option value="expensive">Сначала дороже</option>
+              <option value="year">По году: новее</option>
+              <option value="km">По пробегу: меньше</option>
+            </select>
+          </div>
+          <div class="grid" id="grid"></div>
+          <div class="empty" id="empty" hidden>
+            <p><b>Ничего не нашлось</b></p>
+            <p class="muted">Попробуйте ослабить фильтры или <button type="button" class="link" data-reset>сбросить их</button>.</p>
+          </div>
+        </section>
+      </div>
     </div>
   </section>
 
+  <!-- Страница автомобиля -->
+  <section id="view-car" class="view" hidden></section>
+
+  <!-- Сравнение -->
+  <section id="view-compare" class="view" hidden>
+    <div class="wrap">
+      <h1 class="page-title">Сравнение</h1>
+      <div id="compare"></div>
+    </div>
+  </section>
+
+  <!-- Избранное -->
   <section id="view-favs" class="view" hidden>
     <div class="wrap">
       <h1 class="page-title">Избранное</h1>
-      <p class="muted">Избранное хранится только в этом браузере.</p>
-      <div class="grid" id="favGrid"></div>
-      <div class="empty" id="favEmpty" hidden><p>Пока пусто. Нажмите ♡ на карточке, чтобы сохранить объявление.</p></div>
+      <p class="muted">Сохраняется в этом браузере.</p>
+      <div class="grid grid--wide" id="favGrid"></div>
+      <div class="empty" id="favEmpty" hidden><p>Пока пусто. Нажмите ♡ на объявлении, чтобы сохранить его.</p><a class="btn btn--accent" href="#/">Перейти в каталог</a></div>
     </div>
   </section>
 
+  <!-- Продать -->
   <section id="view-sell" class="view" hidden>
     <div class="wrap sell">
       <div class="sell__intro">
-        <h1 class="page-title">Продать автомобиль</h1>
+        <p class="eyebrow">Бесплатно и без посредников</p>
+        <h1 class="page-title">Продайте автомобиль</h1>
         <ol class="steps">
-          <li><b>Заполните форму.</b> Черновик сохраняется автоматически.</li>
-          <li><b>Отправьте заявку.</b> Откроется GitHub с готовым текстом объявления — нажмите «Submit new issue». Нужен бесплатный аккаунт GitHub.</li>
-          <li><b>Модерация.</b> После проверки объявление появится в каталоге в течение пары минут.</li>
+          <li><b>Заполните форму</b><span>Черновик сохраняется автоматически — можно вернуться позже.</span></li>
+          <li><b>Отправьте заявку</b><span>Откроется GitHub с готовым текстом — нажмите «Create». Фото можно перетащить прямо туда. Нужен бесплатный аккаунт GitHub.</span></li>
+          <li><b>Модерация</b><span>Администратор проверит объявление и опубликует его в каталоге.</span></li>
         </ol>
-        <p class="muted">Нет аккаунта GitHub? Нажмите «Скопировать текст» и пришлите его администратору площадки.</p>
+        <p class="muted small">Нет аккаунта GitHub? Нажмите «Скопировать текст» и отправьте его администратору площадки.</p>
       </div>
       <form id="sellForm" class="sell__form" novalidate>
+        <h2 class="form-sec">Автомобиль</h2>
         <div class="row2">
           <label>Марка*<input name="brand" required list="brandList" placeholder="Toyota"></label>
           <label>Модель*<input name="model" required placeholder="Camry"></label>
@@ -122,6 +149,7 @@
           <label>Пробег, км*<input name="mileage" type="number" required min="0" inputmode="numeric"></label>
           <label>Цена, ₽*<input name="price" type="number" required min="1000" step="1000" inputmode="numeric"></label>
         </div>
+        <h2 class="form-sec">Характеристики</h2>
         <div class="row3">
           <label>Коробка*<select name="transmission" required></select></label>
           <label>Двигатель*<select name="fuel" required></select></label>
@@ -132,33 +160,40 @@
           <label>Мощность, л.с.<input name="power" type="number" min="0" max="2000" inputmode="numeric"></label>
           <label>Привод<select name="drive"><option>Передний</option><option>Задний</option><option>Полный</option></select></label>
         </div>
-        <div class="row2">
+        <div class="row3">
           <label>Цвет<input name="color" placeholder="Белый"></label>
+          <label>Владельцев<input name="owners" type="number" min="1" max="20" inputmode="numeric"></label>
+          <label>Состояние<select name="condition"><option>Не битый</option><option>Был в ДТП, восстановлен</option><option>Требует ремонта</option></select></label>
+        </div>
+        <label>Описание*<textarea name="description" required rows="5" maxlength="2000" placeholder="Состояние, история обслуживания, комплектация, причина продажи"></textarea></label>
+        <label>Ссылки на фото <small>по одной в строке — или приложите файлы в заявке на GitHub</small><textarea name="photos" rows="2" placeholder="https://..."></textarea></label>
+        <h2 class="form-sec">Контакты</h2>
+        <div class="row3">
           <label>Город*<input name="city" required list="cityList" placeholder="Москва"></label>
+          <label>Ваше имя*<input name="seller" required autocomplete="given-name"></label>
+          <label>Телефон / Telegram*<input name="contact" required placeholder="+7… или @ник"></label>
         </div>
         <datalist id="cityList"></datalist>
-        <label>Описание*<textarea name="description" required rows="5" maxlength="2000" placeholder="Состояние, история обслуживания, комплектация, причина продажи"></textarea></label>
-        <label>Ссылки на фото <small>(по одной в строке; можно приложить фото прямо в заявке на GitHub)</small><textarea name="photos" rows="3" placeholder="https://..."></textarea></label>
-        <div class="row2">
-          <label>Ваше имя*<input name="seller" required autocomplete="given-name"></label>
-          <label>Телефон или Telegram*<input name="contact" required placeholder="+7 900 000-00-00 или @username"></label>
-        </div>
         <p class="form-error" id="formError" role="alert"></p>
         <div class="sell__actions">
           <button class="btn btn--accent" type="submit">Отправить на модерацию</button>
-          <button class="btn btn--ghost" type="button" id="copyListing">Скопировать текст</button>
           <button class="btn btn--ghost" type="button" id="previewListing">Предпросмотр</button>
+          <button class="btn btn--ghost" type="button" id="copyListing">Скопировать текст</button>
         </div>
       </form>
     </div>
   </section>
 </main>
 
-<dialog id="detail" class="detail"></dialog>
+<div class="cmp-tray" id="cmpTray" hidden></div>
+<dialog id="lightbox" class="lightbox"></dialog>
+<div class="toast" id="toast" hidden></div>
 
 <footer class="foot">
-  <div class="wrap">
-    <p>Авторынок — некоммерческая площадка объявлений. Проверяйте автомобиль и документы перед покупкой, не переводите предоплату незнакомцам. <a href="admin.html">Вход для администратора</a></p>
+  <div class="wrap foot__in">
+    <a class="logo" href="#/"><span class="logo__mark">А</span><span class="logo__word">Авто<b>рынок</b></span></a>
+    <p>Площадка объявлений от владельцев. Перед покупкой проверяйте автомобиль и документы, не переводите предоплату незнакомцам.</p>
+    <p><a href="#/sell">Разместить объявление</a> · <a href="admin.html">Вход для администратора</a></p>
   </div>
 </footer>
 

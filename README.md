@@ -18,8 +18,14 @@
 
 ## Вход администратора
 
-1. Владелец репозитория приглашает администратора: Админка → Настройки → «Пригласить» (логин GitHub), либо Settings → Collaborators.
-2. Администратор принимает приглашение и создаёт [fine-grained токен](https://github.com/settings/personal-access-tokens/new) на этот репозиторий с правами `Contents: Read and write` и `Issues: Read and write`.
-3. Открывает `admin.html` и вставляет токен.
+Обычный вход — **логин и пароль** (например, `misha`). Пароль в браузере расшифровывает ключ доступа к GitHub, который хранится в `data/admins.json` в зашифрованном виде (AES-256-GCM, PBKDF2-SHA256, 600 000 итераций). Сам пароль нигде не сохраняется.
+
+Первичная настройка (один раз, делает владелец репозитория):
+
+1. Создать [fine-grained токен](https://github.com/settings/personal-access-tokens/new): Repository access → только этот репозиторий; Permissions → `Contents: Read and write`, `Issues: Read and write`.
+2. Открыть `admin.html` → «Первичная настройка: вход по токену GitHub» → вставить токен.
+3. Настройки → «Вход по логину и паролю» → логин `misha`, пароль (от 10 символов) → «Сохранить».
+
+После этого misha входит только по логину и паролю. Чтобы отозвать доступ — удалить учётную запись в админке и отозвать токен на GitHub.
 
 Фото демо-объявлений — Wikimedia Commons, см. [photos/CREDITS.md](photos/CREDITS.md).

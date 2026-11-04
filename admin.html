@@ -8,7 +8,7 @@
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23161616'/%3E%3Cpath d='M7 19l2.5-6h13l2.5 6v4H7z' fill='%23ff5a1f'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700;800&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
 <style>
   .adm { padding: 28px 16px 64px; }
@@ -87,8 +87,17 @@
 
 <main class="wrap adm">
   <section id="login" class="login" hidden>
-    <h1 style="font-size:1.4rem">Вход администратора</h1>
-    <p class="muted" style="margin:0">Объявления хранятся в репозитории GitHub <b id="repoName"></b>. Войти может любой, у кого есть права записи в этот репозиторий.</p>
+    <h1 style="font-size:1.5rem">Вход администратора</h1>
+    <form id="pwForm" style="display:flex;flex-direction:column;gap:12px">
+      <label>Логин<input id="pwLogin" autocomplete="username" required autocapitalize="off" spellcheck="false"></label>
+      <label>Пароль<input id="pwPass" type="password" autocomplete="current-password" required></label>
+      <label class="check"><input type="checkbox" id="pwRemember"> Запомнить на этом устройстве</label>
+      <p class="form-error" id="pwError"></p>
+      <button class="btn btn--accent" type="submit">Войти</button>
+    </form>
+    <details id="tokenBox">
+      <summary class="link" style="cursor:pointer">Первичная настройка: вход по токену GitHub</summary>
+    <p class="muted" style="margin:12px 0">Объявления хранятся в репозитории GitHub <b id="repoName"></b>. Владелец один раз входит по токену и в «Настройках» создаёт учётные записи с логином и паролем.</p>
     <ol>
       <li>Откройте <a href="https://github.com/settings/personal-access-tokens/new" target="_blank" rel="noopener">создание токена GitHub</a> (Fine-grained).</li>
       <li>Repository access → <b>Only select repositories</b> → выберите репозиторий площадки.</li>
@@ -99,8 +108,9 @@
       <label>Токен GitHub<input id="token" type="password" autocomplete="off" required placeholder="github_pat_…"></label>
       <label class="check"><input type="checkbox" id="remember"> Запомнить на этом устройстве</label>
       <p class="form-error" id="loginError"></p>
-      <button class="btn btn--accent" type="submit">Войти</button>
+      <button class="btn btn--dark" type="submit">Войти по токену</button>
     </form>
+    </details>
   </section>
 
   <section id="app" hidden>
@@ -135,7 +145,21 @@
         <label class="switch"><input type="checkbox" id="defaultComments"> Включать обсуждение у новых объявлений</label>
       </div>
       <div class="card-box">
-        <h2>Администраторы</h2>
+        <h2>Вход по логину и паролю</h2>
+        <p class="muted small">Пароль зашифровывает ключ доступа к GitHub (AES-256, PBKDF2 600 000 итераций). Сам пароль нигде не хранится — восстановить его нельзя, только задать новый. Используйте длинный пароль: зашифрованный ключ лежит в открытом репозитории.</p>
+        <div class="admins" id="accounts"></div>
+        <form id="accForm" style="display:flex;flex-direction:column;gap:10px">
+          <div class="row3">
+            <label>Логин<input id="accLogin" required pattern="[a-z0-9_.\-]{2,32}" placeholder="misha" autocapitalize="off" spellcheck="false"></label>
+            <label>Пароль (от 10 символов)<input id="accPass" type="password" required minlength="10" autocomplete="new-password"></label>
+            <label>Повтор пароля<input id="accPass2" type="password" required minlength="10" autocomplete="new-password"></label>
+          </div>
+          <label>Токен GitHub для этой учётной записи <small>— оставьте пустым, чтобы использовать текущий</small><input id="accToken" type="password" autocomplete="off" placeholder="github_pat_…"></label>
+          <div><button class="btn btn--accent" type="submit">Сохранить учётную запись</button></div>
+        </form>
+      </div>
+      <div class="card-box">
+        <h2>Администраторы GitHub</h2>
         <p class="muted small">Администратор — пользователь GitHub с правом записи в репозиторий. Он может размещать, редактировать и удалять объявления и управлять обсуждениями.</p>
         <div class="admins" id="admins"></div>
         <form id="inviteForm" class="bar" style="margin:0">

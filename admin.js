@@ -43,13 +43,19 @@
   const displaySrc = p => (/^https?:/.test(p) ? p : p ? rawUrl(p) : '');
 
   /* ---------- Работа с репозиторием ---------- */
-  async function readDb(ref = branch) {
-    const f = await gh(`${R}/contents/${DB_PATH}?ref=${encodeURIComponent(ref)}`);
-    return JSON.parse(b64decode(f.content));
+  async function readJson(path, ref = branch, fallback) {
+    try {
+      const f = await gh(`${R}/contents/${path}?ref=${encodeURIComponent(ref)}`);
+      return JSON.parse(b64decode(f.content));
+    } catch (e) {
+      if (e.status === 404 && fallback !== undefined) return fallback;
+      throw e;
+    }
   }
+  const readDb = (ref = branch) => readJson(DB_PATH, ref);
 
-  // Одна атомарная правка: читаем свежую базу, меняем, коммитим вместе с файлами (фото).
-  async function mutate(message, fn, files = []) {
+  // Одна атомарная правка: читаем свежий JSON, меняем, коммитим вместе с файлами (фото).
+  async function mutate(message, fn, files = [], path = DB_PATH) {
     const blobs = [];
     for (const f of files) {
       if (f.delete) blobs.push({ path: f.path, mode: '100644', type: 'blob', sha: null });
@@ -62,14 +68,14 @@
       const ref = await gh(`${R}/git/ref/heads/${branch}`);
       const head = ref.object.sha;
       const commit = await gh(`${R}/git/commits/${head}`);
-      const fresh = await readDb(head);
+      const fresh = await readJson(path, head, path === DB_PATH ? undefined : {});
       fn(fresh);
       const dbBlob = await gh(`${R}/git/blobs`, { method: 'POST', body: { content: b64encode(JSON.stringify(fresh, null, 2) + '\n'), encoding: 'base64' } });
-      const tree = await gh(`${R}/git/trees`, { method: 'POST', body: { base_tree: commit.tree.sha, tree: [...blobs, { path: DB_PATH, mode: '100644', type: 'blob', sha: dbBlob.sha }] } });
-      const c = await gh(`${R}/git/commits`, { method: 'POST', body: { message: `${message}\n\nadmin: ${me.login}`, tree: tree.sha, parents: [head] } });
+      const tree = await gh(`${R}/git/trees`, { method: 'POST', body: { base_tree: commit.tree.sha, tree: [...blobs, { path, mode: '100644', type: 'blob', sha: dbBlob.sha }] } });
+      const c = await gh(`${R}/git/commits`, { method: 'POST', body: { message: `${message}\n\nadmin: ${me.as || me.login}`, tree: tree.sha, parents: [head] } });
       try {
         await gh(`${R}/git/refs/heads/${branch}`, { method: 'PATCH', body: { sha: c.sha } });
-        db = fresh;
+        if (path === DB_PATH) db = fresh;
         return fresh;
       } catch (e) {
         if (e.status !== 422 || attempt === 2) throw e; // кто-то сохранил одновременно — повторяем
@@ -119,19 +125,114 @@
   $('#repoName').textContent = `${REPO.owner}/${REPO.repo}`;
   $('#repoLink').href = `https://github.com/${REPO.owner}/${REPO.repo}`;
 
-  async function login() {
+  async function login(as) {
     me = await gh('/user');
     const repo = await gh(R);
     if (!repo.permissions?.push) throw new Error(`У пользователя ${me.login} нет прав записи в ${REPO.owner}/${REPO.repo}`);
     branch = repo.default_branch;
     me.isAdmin = !!repo.permissions.admin;
-    $('#who').innerHTML = `<img src="${esc(me.avatar_url)}&s=56" width="28" height="28" alt=""><span>${esc(me.name || me.login)}</span>`;
+    me.as = as || sessionStorage.getItem('ar:as') || store.get('ar:as', '') || '';
+    $('#who').innerHTML = me.as
+      ? `<span class="avatar" style="width:30px;height:30px;font-size:.9rem">${esc(me.as[0].toUpperCase())}</span><span>${esc(me.as)}</span>`
+      : `<img src="${esc(me.avatar_url)}&s=56" width="28" height="28" alt=""><span>${esc(me.name || me.login)}</span>`;
     $('#login').hidden = true;
     $('#app').hidden = false;
     await reload();
     loadInbox();
     loadAdmins();
+    loadAccounts();
   }
+
+  /* ---------- Логин и пароль: пароль расшифровывает токен GitHub ---------- */
+  const ACC_PATH = 'data/admins.json';
+  const PBKDF2_ITER = 600000;
+  const u8 = b64 => Uint8Array.from(atob(b64), c => c.charCodeAt(0));
+  const b64u8 = a => btoa(String.fromCharCode(...a));
+  async function pwKey(password, salt, iter) {
+    const base = await crypto.subtle.importKey('raw', new TextEncoder().encode(password), 'PBKDF2', false, ['deriveKey']);
+    return crypto.subtle.deriveKey({ name: 'PBKDF2', salt, iterations: iter, hash: 'SHA-256' }, base, { name: 'AES-GCM', length: 256 }, false, ['encrypt', 'decrypt']);
+  }
+  async function sealToken(tok, password) {
+    const salt = crypto.getRandomValues(new Uint8Array(16)), iv = crypto.getRandomValues(new Uint8Array(12));
+    const ct = await crypto.subtle.encrypt({ name: 'AES-GCM', iv }, await pwKey(password, salt, PBKDF2_ITER), new TextEncoder().encode(tok));
+    return { v: 1, kdf: 'PBKDF2-SHA256', iter: PBKDF2_ITER, salt: b64u8(salt), iv: b64u8(iv), ct: b64u8(new Uint8Array(ct)) };
+  }
+  async function openToken(rec, password) {
+    const pt = await crypto.subtle.decrypt({ name: 'AES-GCM', iv: u8(rec.iv) }, await pwKey(password, u8(rec.salt), rec.iter), u8(rec.ct));
+    return new TextDecoder().decode(pt);
+  }
+  async function fetchAccounts() {
+    // свежая копия из API (без кеша Pages); при лимите — с сайта
+    try {
+      const r = await fetch(`${API}${R}/contents/${ACC_PATH}?ref=${branch}`, { headers: { Accept: 'application/vnd.github.raw+json' }, cache: 'no-store' });
+      if (r.ok) return await r.json();
+    } catch { /* сеть */ }
+    const r = await fetch(`${ACC_PATH}?t=${Date.now()}`, { cache: 'no-store' });
+    return r.ok ? r.json() : {};
+  }
+
+  $('#pwForm').addEventListener('submit', async e => {
+    e.preventDefault();
+    const name = $('#pwLogin').value.trim().toLowerCase();
+    const pass = $('#pwPass').value;
+    $('#pwError').textContent = '';
+    busy('Проверяю…');
+    try {
+      const rec = (await fetchAccounts()).accounts?.[name];
+      let tok;
+      try { if (!rec) throw 0; tok = await openToken(rec, pass); }
+      catch { throw new Error('Неверный логин или пароль'); }
+      token = tok;
+      sessionStorage.setItem('ar:as', name);
+      if ($('#pwRemember').checked) store.set('ar:as', name);
+      await login(name);
+      sessionStorage.setItem('ar:token', token);
+      if ($('#pwRemember').checked) store.set('ar:token', token);
+    } catch (err) {
+      token = '';
+      $('#pwError').textContent = err.status === 401 ? 'Ключ доступа этой учётной записи отозван или истёк — владельцу нужно задать его заново.' : err.message;
+    } finally { busy(); }
+  });
+
+  async function loadAccounts() {
+    const acc = (await fetchAccounts()).accounts || {};
+    const names = Object.keys(acc).sort();
+    $('#accounts').innerHTML = names.length
+      ? names.map(n => `<span><span class="avatar" style="width:24px;height:24px;font-size:.75rem">${esc(n[0].toUpperCase())}</span>${esc(n)} <small class="muted">${acc[n].updated ? fmtDate(acc[n].updated) : ''}</small> <button type="button" class="link" data-acc-del="${esc(n)}" aria-label="Удалить ${esc(n)}">✕</button></span>`).join('')
+      : '<p class="muted small">Учётных записей пока нет.</p>';
+  }
+  $('#accForm').addEventListener('submit', async e => {
+    e.preventDefault();
+    const name = $('#accLogin').value.trim().toLowerCase();
+    const p1 = $('#accPass').value, p2 = $('#accPass2').value;
+    const tok = $('#accToken').value.trim() || token;
+    if (!/^[a-z0-9_.-]{2,32}$/.test(name)) return toast('Логин: 2–32 символа, латиница, цифры, _ . -', true);
+    if (p1.length < 10) return toast('Пароль должен быть не короче 10 символов', true);
+    if (p1 !== p2) return toast('Пароли не совпадают', true);
+    busy('Шифрую и сохраняю…');
+    try {
+      if (tok !== token) { // проверяем, что новый токен рабочий
+        const r = await fetch(API + R, { headers: { Authorization: `Bearer ${tok}` } });
+        const j = r.ok ? await r.json() : null;
+        if (!j?.permissions?.push) throw new Error('Указанный токен не даёт права записи в репозиторий');
+      }
+      const rec = { ...(await sealToken(tok, p1)), updated: new Date().toISOString() };
+      await mutate(`Учётная запись ${name}: задан пароль`, d => { d.accounts ||= {}; d.accounts[name] = rec; }, [], ACC_PATH);
+      e.target.reset();
+      await loadAccounts();
+      toast(`Готово: вход «${name}» с паролем работает.`);
+    } catch (err) { toast(err.message, true); } finally { busy(); }
+  });
+  $('#accounts').addEventListener('click', async e => {
+    const b = e.target.closest('[data-acc-del]'); if (!b) return;
+    const name = b.dataset.accDel;
+    if (!confirm(`Удалить вход «${name}»? Токен GitHub при этом не отзывается — при необходимости отзовите его в настройках GitHub.`)) return;
+    busy('Удаляю…');
+    try {
+      await mutate(`Учётная запись ${name} удалена`, d => { if (d.accounts) delete d.accounts[name]; }, [], ACC_PATH);
+      await loadAccounts(); toast('Учётная запись удалена.');
+    } catch (err) { toast(err.message, true); } finally { busy(); }
+  });
 
   $('#loginForm').addEventListener('submit', async e => {
     e.preventDefault();
@@ -139,7 +240,8 @@
     $('#loginError').textContent = '';
     busy('Проверяю доступ…');
     try {
-      await login();
+      ['ar:as'].forEach(k => { sessionStorage.removeItem(k); store.del(k); });
+      await login('');
       sessionStorage.setItem('ar:token', token);
       if ($('#remember').checked) store.set('ar:token', token);
     } catch (err) {
@@ -147,7 +249,7 @@
     } finally { busy(); }
   });
   $('#logout').addEventListener('click', () => {
-    sessionStorage.removeItem('ar:token'); store.del('ar:token'); location.reload();
+    ['ar:token', 'ar:as'].forEach(k => { sessionStorage.removeItem(k); store.del(k); }); location.reload();
   });
 
   (async () => {
