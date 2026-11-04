@@ -1,0 +1,219 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Авторынок — админка</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23161616'/%3E%3Cpath d='M7 19l2.5-6h13l2.5 6v4H7z' fill='%23ff5a1f'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700;800&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<style>
+  .adm { padding: 28px 16px 64px; }
+  .login { max-width: 560px; margin: 48px auto; background: var(--surface); padding: 28px; border-radius: var(--radius); box-shadow: var(--shadow); display: flex; flex-direction: column; gap: 14px; }
+  .login ol { padding-left: 1.2em; margin: 0; display: flex; flex-direction: column; gap: 6px; font-size: .925rem; }
+  .login code { background: var(--bg); padding: 1px 6px; border-radius: 6px; font-size: .85em; }
+  .check { flex-direction: row; align-items: center; gap: 8px; color: var(--ink); font-weight: 500; }
+  .check input { width: auto; }
+  .tabs { display: flex; gap: 6px; flex-wrap: wrap; border-bottom: 1px solid var(--line); margin-bottom: 20px; }
+  .tabs button { border: 0; background: none; padding: 10px 14px; font-weight: 700; cursor: pointer; border-bottom: 3px solid transparent; color: var(--muted); }
+  .tabs button[aria-selected="true"] { color: var(--ink); border-color: var(--accent); }
+  .bar { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-bottom: 16px; }
+  .bar input[type=search] { max-width: 320px; }
+  .bar .grow { flex: 1; }
+  .rows { display: flex; flex-direction: column; gap: 10px; }
+  .row { display: grid; grid-template-columns: 96px 1fr auto; gap: 14px; align-items: center; background: var(--surface); border-radius: var(--radius); padding: 10px; box-shadow: var(--shadow); }
+  .row img { width: 96px; height: 72px; object-fit: cover; border-radius: 8px; background: var(--line); }
+  .row h3 { font-family: Manrope, sans-serif; font-size: 1rem; margin: 0 0 2px; }
+  .row p { margin: 0; font-size: .875rem; color: var(--muted); }
+  .row__ctl { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; justify-content: flex-end; }
+  .row__ctl select { width: auto; padding: .35em .5em; font-size: .875rem; }
+  .pill { display: inline-block; font-size: .72rem; font-weight: 700; padding: 1px 8px; border-radius: 999px; background: var(--bg); color: var(--muted); margin-left: 6px; vertical-align: middle; }
+  .pill--on { background: var(--accent-soft); color: var(--accent); }
+  .switch { position: relative; display: inline-flex; align-items: center; gap: 8px; cursor: pointer; font-size: .85rem; font-weight: 600; color: var(--ink); flex-direction: row; }
+  .switch input { appearance: none; width: 40px; height: 22px; border-radius: 999px; background: var(--line); position: relative; padding: 0; border: 0; cursor: pointer; transition: background .15s; flex: none; }
+  .switch input::after { content: ""; position: absolute; top: 3px; left: 3px; width: 16px; height: 16px; border-radius: 50%; background: #fff; transition: left .15s; }
+  .switch input:checked { background: var(--ok); }
+  .switch input:checked::after { left: 21px; }
+  .editor { width: min(980px, 100vw - 32px); max-height: calc(100vh - 32px); border: 0; border-radius: 20px; padding: 0; background: var(--surface); color: var(--ink); }
+  .editor::backdrop { background: rgba(10,10,10,.6); }
+  .editor form { padding: 24px; display: flex; flex-direction: column; gap: 14px; }
+  .editor__head { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+  .editor__head h2 { margin: 0; font-size: 1.3rem; }
+  .row4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+  .photos { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 10px; }
+  .ph { position: relative; aspect-ratio: 4/3; border-radius: 10px; overflow: hidden; background: var(--line); }
+  .ph img { width: 100%; height: 100%; object-fit: cover; }
+  .ph__ctl { position: absolute; inset: auto 0 0 0; display: flex; justify-content: space-between; padding: 4px; background: linear-gradient(transparent, rgba(0,0,0,.6)); }
+  .ph__ctl button { border: 0; border-radius: 6px; background: rgba(255,255,255,.9); color: #161616; cursor: pointer; font-size: .8rem; padding: 2px 7px; }
+  .ph__main { position: absolute; left: 6px; top: 6px; background: var(--accent); color: #fff; font-size: .7rem; font-weight: 700; padding: 1px 7px; border-radius: 999px; }
+  .ph__new { position: absolute; right: 6px; top: 6px; background: var(--ok); color: #fff; font-size: .7rem; font-weight: 700; padding: 1px 7px; border-radius: 999px; }
+  .drop { display: grid; place-items: center; text-align: center; aspect-ratio: 4/3; border: 2px dashed var(--line); border-radius: 10px; cursor: pointer; color: var(--muted); font-size: .85rem; padding: 8px; }
+  .drop.over { border-color: var(--accent); color: var(--accent); }
+  .drop input { display: none; }
+  .editor__foot { display: flex; gap: 10px; justify-content: flex-end; flex-wrap: wrap; position: sticky; bottom: 0; background: var(--surface); padding-top: 12px; border-top: 1px solid var(--line); }
+  .toast { position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%); background: var(--ink); color: var(--bg); padding: 12px 18px; border-radius: 12px; font-weight: 600; z-index: 100; max-width: calc(100vw - 32px); box-shadow: var(--shadow); }
+  .toast.err { background: var(--danger); color: #fff; }
+  .card-box { background: var(--surface); border-radius: var(--radius); padding: 20px; box-shadow: var(--shadow); margin-bottom: 16px; display: flex; flex-direction: column; gap: 12px; max-width: 760px; }
+  .card-box h2 { font-size: 1.1rem; margin: 0; }
+  .card-box p { margin: 0; }
+  .admins { display: flex; flex-wrap: wrap; gap: 8px; }
+  .admins span { display: inline-flex; align-items: center; gap: 6px; background: var(--bg); padding: 4px 10px 4px 4px; border-radius: 999px; font-weight: 600; font-size: .9rem; }
+  .admins img { border-radius: 50%; }
+  .busy { position: fixed; inset: 0; background: rgba(0,0,0,.35); display: grid; place-items: center; z-index: 90; color: #fff; font-weight: 700; font-size: 1.05rem; }
+  .who { display: flex; align-items: center; gap: 10px; color: #fff; font-weight: 600; }
+  .who img { border-radius: 50%; }
+  @media (max-width: 700px) {
+    .row { grid-template-columns: 72px 1fr; }
+    .row img { width: 72px; height: 54px; }
+    .row__ctl { grid-column: 1 / -1; justify-content: flex-start; }
+    .row4 { grid-template-columns: 1fr 1fr; }
+    .row3 { grid-template-columns: 1fr 1fr; }
+    .editor { width: 100vw; max-width: 100vw; max-height: 100dvh; height: 100dvh; border-radius: 0; margin: 0; }
+    .editor form { padding: 16px; }
+    .who span { display: none; }
+  }
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="wrap top__in">
+    <a class="logo" href="./"><span class="logo__mark">А</span><span>Авто<b>рынок</b> · админка</span></a>
+    <div class="who" id="who"></div>
+  </div>
+</header>
+
+<main class="wrap adm">
+  <section id="login" class="login" hidden>
+    <h1 style="font-size:1.4rem">Вход администратора</h1>
+    <p class="muted" style="margin:0">Объявления хранятся в репозитории GitHub <b id="repoName"></b>. Войти может любой, у кого есть права записи в этот репозиторий.</p>
+    <ol>
+      <li>Откройте <a href="https://github.com/settings/personal-access-tokens/new" target="_blank" rel="noopener">создание токена GitHub</a> (Fine-grained).</li>
+      <li>Repository access → <b>Only select repositories</b> → выберите репозиторий площадки.</li>
+      <li>Permissions → Repository: <code>Contents</code> — Read and write, <code>Issues</code> — Read and write. Для добавления админов — ещё <code>Administration</code> — Read and write.</li>
+      <li>Нажмите Generate token и вставьте токен ниже.</li>
+    </ol>
+    <form id="loginForm" style="display:flex;flex-direction:column;gap:12px">
+      <label>Токен GitHub<input id="token" type="password" autocomplete="off" required placeholder="github_pat_…"></label>
+      <label class="check"><input type="checkbox" id="remember"> Запомнить на этом устройстве</label>
+      <p class="form-error" id="loginError"></p>
+      <button class="btn btn--accent" type="submit">Войти</button>
+    </form>
+  </section>
+
+  <section id="app" hidden>
+    <div class="tabs" role="tablist">
+      <button role="tab" data-tab="list" aria-selected="true">Объявления</button>
+      <button role="tab" data-tab="inbox" aria-selected="false">Заявки <span class="badge" id="inboxCount" style="background:var(--accent);color:#fff">0</span></button>
+      <button role="tab" data-tab="settings" aria-selected="false">Настройки</button>
+    </div>
+
+    <div data-panel="list">
+      <div class="bar">
+        <input type="search" id="search" placeholder="Поиск по объявлениям">
+        <select id="statusFilter" style="width:auto">
+          <option value="">Все статусы</option><option value="active">В продаже</option><option value="sold">Продано</option><option value="hidden">Скрыто</option>
+        </select>
+        <span class="grow"></span>
+        <button class="btn btn--accent" id="addBtn" type="button">+ Новое объявление</button>
+      </div>
+      <div class="rows" id="rows"></div>
+    </div>
+
+    <div data-panel="inbox" hidden>
+      <p class="muted">Заявки, которые посетители отправили через форму «Продать авто». Откройте заявку в редакторе, проверьте и опубликуйте — или отклоните.</p>
+      <div class="rows" id="inbox"></div>
+    </div>
+
+    <div data-panel="settings" hidden>
+      <div class="card-box">
+        <h2>Обсуждения</h2>
+        <label class="switch"><input type="checkbox" id="globalComments"> Обсуждения на сайте включены</label>
+        <p class="muted small">Главный выключатель. Если он выключен, обсуждения скрыты у всех объявлений. Если включён — обсуждение показывается у тех объявлений, где оно включено отдельно (переключатель в списке объявлений).</p>
+        <label class="switch"><input type="checkbox" id="defaultComments"> Включать обсуждение у новых объявлений</label>
+      </div>
+      <div class="card-box">
+        <h2>Администраторы</h2>
+        <p class="muted small">Администратор — пользователь GitHub с правом записи в репозиторий. Он может размещать, редактировать и удалять объявления и управлять обсуждениями.</p>
+        <div class="admins" id="admins"></div>
+        <form id="inviteForm" class="bar" style="margin:0">
+          <input id="inviteLogin" placeholder="Логин GitHub, например misha" style="max-width:280px" required pattern="[A-Za-z0-9-]{1,39}">
+          <button class="btn btn--ghost" type="submit">Пригласить</button>
+        </form>
+        <p class="muted small">Приглашённый получит письмо от GitHub и должен принять приглашение, после чего сможет войти в админку со своим токеном.</p>
+      </div>
+      <div class="card-box">
+        <h2>Сессия</h2>
+        <div class="bar" style="margin:0">
+          <a class="btn btn--ghost" id="repoLink" target="_blank" rel="noopener">Репозиторий на GitHub</a>
+          <button class="btn btn--ghost" id="logout" type="button">Выйти</button>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<dialog class="editor" id="editor">
+  <form id="editForm" novalidate>
+    <div class="editor__head">
+      <h2 id="editTitle">Объявление</h2>
+      <button type="button" class="btn btn--ghost btn--sm" data-close>✕</button>
+    </div>
+    <div class="row4">
+      <label>Марка*<input name="brand" required list="brandList"></label>
+      <label>Модель*<input name="model" required></label>
+      <label>Год*<input name="year" type="number" required min="1950" max="2027"></label>
+      <label>Цена, ₽*<input name="price" type="number" required min="0" step="1000"></label>
+    </div>
+    <datalist id="brandList"></datalist>
+    <div class="row4">
+      <label>Пробег, км*<input name="mileage" type="number" required min="0"></label>
+      <label>Коробка*<select name="transmission" required></select></label>
+      <label>Двигатель*<select name="fuel" required></select></label>
+      <label>Кузов*<select name="body" required></select></label>
+    </div>
+    <div class="row4">
+      <label>Объём, л<input name="engine" type="number" min="0" max="10" step="0.1"></label>
+      <label>Мощность, л.с.<input name="power" type="number" min="0"></label>
+      <label>Привод<select name="drive"></select></label>
+      <label>Руль<select name="wheel"><option value="">—</option><option>Левый</option><option>Правый</option></select></label>
+    </div>
+    <div class="row4">
+      <label>Цвет<input name="color"></label>
+      <label>Владельцев<input name="owners" type="number" min="1" max="20"></label>
+      <label>Состояние<select name="condition"><option value="">—</option><option>Не битый</option><option>Был в ДТП, восстановлен</option><option>Требует ремонта</option></select></label>
+      <label>VIN<input name="vin" maxlength="17" style="text-transform:uppercase"></label>
+    </div>
+    <div class="row4">
+      <label>Город*<input name="city" required list="cityList"></label>
+      <label>Продавец*<input name="seller" required></label>
+      <label>Телефон / Telegram*<input name="contact" required></label>
+      <label>Статус<select name="status"><option value="active">В продаже</option><option value="sold">Продано</option><option value="hidden">Скрыто</option></select></label>
+    </div>
+    <datalist id="cityList"></datalist>
+    <label>Описание*<textarea name="description" rows="6" required maxlength="4000"></textarea></label>
+    <div>
+      <p style="margin:0 0 6px;font-weight:600;color:var(--muted);font-size:.85rem">Фотографии <span class="muted">— первая будет обложкой; можно перетащить файлы</span></p>
+      <div class="photos" id="photos"></div>
+    </div>
+    <label>Добавить фото по ссылке<input id="photoUrl" type="url" placeholder="https://… (Enter — добавить)"></label>
+    <label class="switch"><input type="checkbox" name="comments"> Обсуждение у этого объявления</label>
+    <p class="form-error" id="editError"></p>
+    <div class="editor__foot">
+      <button type="button" class="btn btn--danger" id="deleteBtn">Удалить</button>
+      <span style="flex:1"></span>
+      <button type="button" class="btn btn--ghost" data-close>Отмена</button>
+      <button type="submit" class="btn btn--accent">Сохранить и опубликовать</button>
+    </div>
+  </form>
+</dialog>
+
+<div class="busy" id="busy" hidden></div>
+<div class="toast" id="toast" hidden></div>
+
+<script src="common.js"></script>
+<script src="admin.js"></script>
+</body>
+</html>

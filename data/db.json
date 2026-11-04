@@ -1,0 +1,559 @@
+{
+  "settings": {
+    "comments": true,
+    "defaultComments": true
+  },
+  "listings": [
+    {
+      "id": "camry-2019",
+      "brand": "Toyota",
+      "model": "Camry",
+      "year": 2019,
+      "mileage": 78000,
+      "price": 2790000,
+      "transmission": "Автомат",
+      "fuel": "Бензин",
+      "body": "Седан",
+      "engine": 2.5,
+      "power": 181,
+      "drive": "Передний",
+      "wheel": "Левый",
+      "color": "Белый",
+      "owners": 2,
+      "condition": "Не битый",
+      "city": "Москва",
+      "seller": "Андрей",
+      "contact": "+7 916 555-12-34",
+      "description": "Комплектация «Престиж». Обслуживание только у официального дилера, все записи в сервисной книжке. Два комплекта резины на дисках. Салон без прожогов и потёртостей, не курили. Торг у машины.",
+      "photos": [
+        "photos/camry/1.jpg",
+        "photos/camry/2.jpg",
+        "photos/camry/3.jpg"
+      ],
+      "credits": [
+        {
+          "file": "photos/camry/1.jpg",
+          "source": "https://commons.wikimedia.org/wiki/File:Toyota_Camry_(XV70)_IMG_9081.jpg",
+          "author": "",
+          "license": "CC BY-SA 4.0"
+        },
+        {
+          "file": "photos/camry/2.jpg",
+          "source": "https://commons.wikimedia.org/wiki/File:TOYOTA_CAMRY_(XV70)_China_(5).jpg",
+          "author": "",
+          "license": "CC BY-SA 4.0"
+        },
+        {
+          "file": "photos/camry/3.jpg",
+          "source": "https://commons.wikimedia.org/wiki/File:TOYOTA_CAMRY_(XV70)_China_(3).jpg",
+          "author": "",
+          "license": "CC BY-SA 4.0"
+        }
+      ],
+      "status": "active",
+      "comments": true,
+      "issue": 1,
+      "created": "2026-11-03T10:00:00.000Z",
+      "updated": "2026-11-03T10:00:00.000Z"
+    },
+    {
+      "id": "rio-2018",
+      "brand": "Kia",
+      "model": "Rio",
+      "year": 2018,
+      "mileage": 96500,
+      "price": 1190000,
+      "transmission": "Автомат",
+      "fuel": "Бензин",
+      "body": "Седан",
+      "engine": 1.6,
+      "power": 123,
+      "drive": "Передний",
+      "wheel": "Левый",
+      "color": "Серебристый",
+      "owners": 1,
+      "condition": "Не битый",
+      "city": "Казань",
+      "seller": "Ильдар",
+      "contact": "@ildar_auto",
+      "description": "Один владелец, покупал новым в салоне. Масло менял каждые 10 тыс. км. Есть небольшой скол на капоте, на фото видно. Зимой хранилась в тёплом паркинге.",
+      "photos": [
+        "photos/rio/1.jpg",
+        "photos/rio/2.jpg",
+        "photos/rio/3.jpg"
+      ],
+      "credits": [
+        {
+          "file": "photos/rio/1.jpg",
+          "source": "https://commons.wikimedia.org/wiki/File:Kia_Rio_2017_(Russia).jpg",
+          "author": "",
+          "license": "CC BY-SA 4.0"
+        },
+        {
+          "file": "photos/rio/2.jpg",
+          "source": "https://commons.wikimedia.org/wiki/File:2017_Kia_Rio_Interior.jpg",
+          "author": "Vauxf",
+          "license": "CC BY-SA 4.0"
+        },
+        {
+          "file": "photos/rio/3.jpg",
+          "source": "https://commons.wikimedia.org/wiki/File:2017_Kia_Rio_2_1.3_Rear.jpg",
+          "author": "",
+          "license": "CC BY-SA 4.0"
+        }
+      ],
+      "status": "active",
+      "comments": true,
+      "issue": 2,
+      "created": "2026-11-02T10:00:00.000Z",
+      "updated": "2026-11-02T10:00:00.000Z"
+    },
+    {
+      "id": "solaris-2016",
+      "brand": "Hyundai",
+      "model": "Solaris",
+      "year": 2016,
+      "mileage": 142000,
+      "price": 895000,
+      "transmission": "Механика",
+      "fuel": "Бензин",
+      "body": "Седан",
+      "engine": 1.4,
+      "power": 107,
+      "drive": "Передний",
+      "wheel": "Левый",
+      "color": "Белый",
+      "owners": 2,
+      "condition": "Не битый",
+      "city": "Екатеринбург",
+      "seller": "Ольга",
+      "contact": "+7 912 300-45-67",
+      "description": "Надёжная машина для города, расход 6,5 л. Заменены сцепление и передние колодки в прошлом году. Кондиционер работает. Продаю в связи с покупкой кроссовера.",
+      "photos": [
+        "photos/solaris/1.jpg",
+        "photos/solaris/2.jpg"
+      ],
+      "credits": [
+        {
+          "file": "photos/solaris/1.jpg",
+          "source": "https://commons.wikimedia.org/wiki/File:2014-2017_Hyundai_Solaris_Sedan_(front).jpg",
+          "author": "",
+          "license": "CC BY-SA 4.0"
+        },
+        {
+          "file": "photos/solaris/2.jpg",
+          "source": "https://commons.wikimedia.org/wiki/File:2014-2017_Hyundai_Solaris_Sedan_(rear).jpg",
+          "author": "",
+          "license": "CC BY-SA 4.0"
+        }
+      ],
+      "status": "active",
+      "comments": true,
+      "issue": 3,
+      "created": "2026-10-31T10:00:00.000Z",
+      "updated": "2026-10-31T10:00:00.000Z"
+    },
+    {
+      "id": "vesta-2021",
+      "brand": "Lada",
+      "model": "Vesta",
+      "year": 2021,
+      "mileage": 54000,
+      "price": 1150000,
+      "transmission": "Механика",
+      "fuel": "Бензин",
+      "body": "Седан",
+      "engine": 1.6,
+      "power": 106,
+      "drive": "Передний",
+      "wheel": "Левый",
+      "color": "Оранжевый",
+      "owners": 1,
+      "condition": "Не битый",
+      "city": "Самара",
+      "seller": "Дмитрий",
+      "contact": "+7 927 111-22-33",
+      "description": "Комплектация Luxe, мультимедиа, камера заднего вида, подогрев всех сидений и руля. На гарантии до конца года. Не такси, не каршеринг.",
+      "photos": [
+        "photos/vesta/1.jpg",
+        "photos/vesta/2.jpg"
+      ],
+      "credits": [
+        {
+          "file": "photos/vesta/1.jpg",
+          "source": "https://commons.wikimedia.org/wiki/File:Lada_Vesta_(cropped).jpg",
+          "author": "Sergey Rodovnichenko",
+          "license": "CC BY-SA 2.0"
+        },
+        {
+          "file": "photos/vesta/2.jpg",
+          "source": "https://commons.wikimedia.org/wiki/File:Lada_Vesta_Sport_(Lada_Sport).jpg",
+          "author": "",
+          "license": "CC BY-SA 4.0"
+        }
+      ],
+      "status": "active",
+      "comments": true,
+      "issue": 4,
+      "created": "2026-11-01T10:00:00.000Z",
+      "updated": "2026-11-01T10:00:00.000Z"
+    },
+    {
+      "id": "polo-2015",
+      "brand": "Volkswagen",
+      "model": "Polo",
+      "year": 2015,
+      "mileage": 168000,
+      "price": 780000,
+      "transmission": "Автомат",
+      "fuel": "Бензин",
+      "body": "Седан",
+      "engine": 1.6,
+      "power": 110,
+      "drive": "Передний",
+      "wheel": "Левый",
+      "color": "Серый",
+      "owners": 3,
+      "condition": "Был в ДТП, восстановлен",
+      "city": "Нижний Новгород",
+      "seller": "Сергей",
+      "contact": "@sergey_nn",
+      "description": "Было лёгкое ДТП — заменено заднее крыло, геометрия кузова в норме. АКПП переключается мягко, масло в коробке менял на 150 тыс. Резина зимняя новая.",
+      "photos": [
+        "photos/polo/1.jpg",
+        "photos/polo/2.jpg",
+        "photos/polo/3.jpg"
+      ],
+      "credits": [
+        {
+          "file": "photos/polo/1.jpg",
+          "source": "https://commons.wikimedia.org/wiki/File:2015_Volkswagen_Polo_sedan_1.6.jpg",
+          "author": "Rutger van der Maar",
+          "license": "CC BY 2.0"
+        },
+        {
+          "file": "photos/polo/2.jpg",
+          "source": "https://commons.wikimedia.org/wiki/File:2015_VW_Polo_Sedan_(2).jpg",
+          "author": "",
+          "license": "CC BY-SA 4.0"
+        },
+        {
+          "file": "photos/polo/3.jpg",
+          "source": "https://commons.wikimedia.org/wiki/File:2015_VW_Polo_Sedan_(4).jpg",
+          "author": "",
+          "license": "CC BY-SA 4.0"
+        }
+      ],
+      "status": "sold",
+      "comments": true,
+      "issue": 5,
+      "created": "2026-10-29T10:00:00.000Z",
+      "updated": "2026-10-29T10:00:00.000Z"
+    },
+    {
+      "id": "x5-2020",
+      "brand": "BMW",
+      "model": "X5",
+      "year": 2020,
+      "mileage": 61000,
+      "price": 6990000,
+      "transmission": "Автомат",
+      "fuel": "Дизель",
+      "body": "Внедорожник",
+      "engine": 3.0,
+      "power": 249,
+      "drive": "Полный",
+      "wheel": "Левый",
+      "color": "Чёрный",
+      "owners": 1,
+      "condition": "Не битый",
+      "city": "Санкт-Петербург",
+      "seller": "Максим",
+      "contact": "+7 921 777-88-99",
+      "description": "xDrive30d M Sport. Пневмоподвеска, панорама, Harman Kardon, проекция, вентиляция сидений. Полная история у дилера, последнее ТО — 2 месяца назад. Возможен обмен.",
+      "photos": [
+        "photos/x5/1.jpg",
+        "photos/x5/2.jpg",
+        "photos/x5/3.jpg"
+      ],
+      "credits": [
+        {
+          "file": "photos/x5/1.jpg",
+          "source": "https://commons.wikimedia.org/wiki/File:BMW_X5_(G05)_China_(4).jpg",
+          "author": "",
+          "license": "CC BY-SA 4.0"
+        },
+        {
+          "file": "photos/x5/2.jpg",
+          "source": "https://commons.wikimedia.org/wiki/File:BMW_X5_(G05)_China.jpg",
+          "author": "",
+          "license": "CC BY-SA 4.0"
+        },
+        {
+          "file": "photos/x5/3.jpg",
+          "source": "https://commons.wikimedia.org/wiki/File:BMW_X5_(G05)_China_(17).jpg",
+          "author": "",
+          "license": "CC BY-SA 4.0"
+        }
+      ],
+      "status": "active",
+      "comments": false,
+      "issue": null,
+      "created": "2026-11-03T10:00:00.000Z",
+      "updated": "2026-11-03T10:00:00.000Z"
+    },
+    {
+      "id": "jolion-2023",
+      "brand": "Haval",
+      "model": "Jolion",
+      "year": 2023,
+      "mileage": 23000,
+      "price": 2150000,
+      "transmission": "Робот",
+      "fuel": "Бензин",
+      "body": "Кроссовер",
+      "engine": 1.5,
+      "power": 150,
+      "drive": "Передний",
+      "wheel": "Левый",
+      "color": "Синий",
+      "owners": 1,
+      "condition": "Не битый",
+      "city": "Краснодар",
+      "seller": "Виктория",
+      "contact": "+7 918 404-50-60",
+      "description": "Комплектация Premium. Как новая, в салоне плёнки на экранах. Тонировка задних стёкол, коврики, сетка в багажник в подарок. На гарантии.",
+      "photos": [
+        "photos/jolion/1.jpg",
+        "photos/jolion/2.jpg",
+        "photos/jolion/3.jpg"
+      ],
+      "credits": [
+        {
+          "file": "photos/jolion/1.jpg",
+          "source": "https://commons.wikimedia.org/wiki/File:Haval_Jolion_002.jpg",
+          "author": "",
+          "license": "CC BY-SA 4.0"
+        },
+        {
+          "file": "photos/jolion/2.jpg",
+          "source": "https://commons.wikimedia.org/wiki/File:Haval_Jolion_001.jpg",
+          "author": "",
+          "license": "CC BY-SA 4.0"
+        },
+        {
+          "file": "photos/jolion/3.jpg",
+          "source": "https://commons.wikimedia.org/wiki/File:Haval_Jolion_1st_gen_in_Moscow_2024_back.jpg",
+          "author": "Nor",
+          "license": "CC BY-SA 4.0"
+        }
+      ],
+      "status": "active",
+      "comments": true,
+      "issue": 6,
+      "created": "2026-10-30T10:00:00.000Z",
+      "updated": "2026-10-30T10:00:00.000Z"
+    },
+    {
+      "id": "eclass-2018",
+      "brand": "Mercedes-Benz",
+      "model": "E-Класс",
+      "year": 2018,
+      "mileage": 89000,
+      "price": 3750000,
+      "transmission": "Автомат",
+      "fuel": "Бензин",
+      "body": "Седан",
+      "engine": 2.0,
+      "power": 197,
+      "drive": "Задний",
+      "wheel": "Левый",
+      "color": "Чёрный",
+      "owners": 2,
+      "condition": "Не битый",
+      "city": "Москва",
+      "seller": "Георгий",
+      "contact": "@georgy_e200",
+      "description": "E 200, рестайлинг-оптика Multibeam, ассистенты, кожаный салон. Обслуживание по регламенту, все чеки. Без вложений, сел и поехал.",
+      "photos": [
+        "photos/eclass/1.jpg",
+        "photos/eclass/2.jpg",
+        "photos/eclass/3.jpg"
+      ],
+      "credits": [
+        {
+          "file": "photos/eclass/1.jpg",
+          "source": "https://commons.wikimedia.org/wiki/File:MERCEDES-BENZ_E-CLASS_(W213)_China.jpg",
+          "author": "",
+          "license": "CC BY-SA 4.0"
+        },
+        {
+          "file": "photos/eclass/2.jpg",
+          "source": "https://commons.wikimedia.org/wiki/File:MERCEDES-BENZ_E-CLASS_(W213)_China_(4).jpg",
+          "author": "",
+          "license": "CC BY-SA 4.0"
+        },
+        {
+          "file": "photos/eclass/3.jpg",
+          "source": "https://commons.wikimedia.org/wiki/File:MERCEDES-BENZ_E-CLASS_(W213)_China_(3).jpg",
+          "author": "",
+          "license": "CC BY-SA 4.0"
+        }
+      ],
+      "status": "active",
+      "comments": true,
+      "issue": 7,
+      "created": "2026-10-27T10:00:00.000Z",
+      "updated": "2026-10-27T10:00:00.000Z"
+    },
+    {
+      "id": "rav4-2020",
+      "brand": "Toyota",
+      "model": "RAV4",
+      "year": 2020,
+      "mileage": 72000,
+      "price": 3290000,
+      "transmission": "Вариатор",
+      "fuel": "Бензин",
+      "body": "Кроссовер",
+      "engine": 2.0,
+      "power": 149,
+      "drive": "Полный",
+      "wheel": "Левый",
+      "color": "Красный",
+      "owners": 1,
+      "condition": "Не битый",
+      "city": "Новосибирск",
+      "seller": "Алексей",
+      "contact": "+7 913 222-11-00",
+      "description": "Полный привод, подогрев лобового стекла, автозапуск. Резина на летних и зимних дисках. Сибирская машина, антикор делали каждый год.",
+      "photos": [
+        "photos/rav4/1.jpg",
+        "photos/rav4/2.jpg"
+      ],
+      "credits": [
+        {
+          "file": "photos/rav4/1.jpg",
+          "source": "https://commons.wikimedia.org/wiki/File:Toyota_RAV4_Hybrid_(XA50)_DSC_2709.jpg",
+          "author": "",
+          "license": "CC BY-SA 4.0"
+        },
+        {
+          "file": "photos/rav4/2.jpg",
+          "source": "https://commons.wikimedia.org/wiki/File:2021_Toyota_RAV4_PHV.jpg",
+          "author": "TTTNIS",
+          "license": "CC0"
+        }
+      ],
+      "status": "active",
+      "comments": true,
+      "issue": 8,
+      "created": "2026-10-28T10:00:00.000Z",
+      "updated": "2026-10-28T10:00:00.000Z"
+    },
+    {
+      "id": "niva-2022",
+      "brand": "Lada",
+      "model": "Niva Legend",
+      "year": 2022,
+      "mileage": 31000,
+      "price": 890000,
+      "transmission": "Механика",
+      "fuel": "Бензин",
+      "body": "Внедорожник",
+      "engine": 1.7,
+      "power": 83,
+      "drive": "Полный",
+      "wheel": "Левый",
+      "color": "Зелёный",
+      "owners": 1,
+      "condition": "Не битый",
+      "city": "Пермь",
+      "seller": "Николай",
+      "contact": "+7 902 600-70-80",
+      "description": "Для рыбалки и охоты. Установлена защита картера, фаркоп, шумоизоляция. Ездил аккуратно, по бездорожью без фанатизма.",
+      "photos": [
+        "photos/niva/1.jpg",
+        "photos/niva/2.jpg",
+        "photos/niva/3.jpg"
+      ],
+      "credits": [
+        {
+          "file": "photos/niva/1.jpg",
+          "source": "https://commons.wikimedia.org/wiki/File:Lada_Niva_2016_IMG_8387.jpg",
+          "author": "",
+          "license": "CC BY-SA 4.0"
+        },
+        {
+          "file": "photos/niva/2.jpg",
+          "source": "https://commons.wikimedia.org/wiki/File:Lada_Niva,_Sabir_(P1090298).jpg",
+          "author": "Matti Blu",
+          "license": "CC BY-SA 4.0"
+        },
+        {
+          "file": "photos/niva/3.jpg",
+          "source": "https://commons.wikimedia.org/wiki/File:Lada_4x4,_Almaty_(P1180249).jpg",
+          "author": "Matti Blu",
+          "license": "CC BY-SA 4.0"
+        }
+      ],
+      "status": "active",
+      "comments": true,
+      "issue": 9,
+      "created": "2026-10-25T10:00:00.000Z",
+      "updated": "2026-10-25T10:00:00.000Z"
+    },
+    {
+      "id": "sportage-2022",
+      "brand": "Kia",
+      "model": "Sportage",
+      "year": 2022,
+      "mileage": 38000,
+      "price": 3450000,
+      "transmission": "Автомат",
+      "fuel": "Бензин",
+      "body": "Кроссовер",
+      "engine": 2.0,
+      "power": 150,
+      "drive": "Полный",
+      "wheel": "Левый",
+      "color": "Серый",
+      "owners": 1,
+      "condition": "Не битый",
+      "city": "Ростов-на-Дону",
+      "seller": "Ирина",
+      "contact": "@irina_kia",
+      "description": "Новое поколение, комплектация Prestige: изогнутый экран, круговой обзор, электропривод багажника. Женщина за рулём, гаражное хранение.",
+      "photos": [
+        "photos/sportage/1.jpg",
+        "photos/sportage/2.jpg",
+        "photos/sportage/3.jpg"
+      ],
+      "credits": [
+        {
+          "file": "photos/sportage/1.jpg",
+          "source": "https://commons.wikimedia.org/wiki/File:Kia_Sportage_(NQ5)_1X7A0319.jpg",
+          "author": "",
+          "license": "CC BY-SA 4.0"
+        },
+        {
+          "file": "photos/sportage/2.jpg",
+          "source": "https://commons.wikimedia.org/wiki/File:Kia_Sportage_(NQ5)_1X7A0328.jpg",
+          "author": "",
+          "license": "CC BY-SA 4.0"
+        },
+        {
+          "file": "photos/sportage/3.jpg",
+          "source": "https://commons.wikimedia.org/wiki/File:Kia_Sportage_(NQ5)_1X7A0326.jpg",
+          "author": "",
+          "license": "CC BY-SA 4.0"
+        }
+      ],
+      "status": "active",
+      "comments": true,
+      "issue": 10,
+      "created": "2026-11-02T10:00:00.000Z",
+      "updated": "2026-11-02T10:00:00.000Z"
+    }
+  ]
+}
