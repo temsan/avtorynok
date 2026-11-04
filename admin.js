@@ -17,11 +17,17 @@
 
   /* ---------- Утилиты ---------- */
   function toast(msg, err = false) {
-    const t = $('#toast');
+    const t = $('#toast'), host = $('dialog[open]') || document.body;
+    if (t.parentElement !== host) host.appendChild(t);
     t.textContent = msg; t.className = 'toast' + (err ? ' err' : ''); t.hidden = false;
     clearTimeout(toast._t); toast._t = setTimeout(() => (t.hidden = true), err ? 7000 : 4000);
   }
-  function busy(msg) { const b = $('#busy'); b.textContent = msg || ''; b.hidden = !msg; }
+  // Индикатор работы. Открытое модальное окно лежит поверх всего, поэтому индикатор кладём внутрь него — иначе его не видно.
+  function busy(msg) {
+    const b = $('#busy'), host = $('dialog[open]') || document.body;
+    if (b.parentElement !== host) host.appendChild(b);
+    b.textContent = msg || ''; b.hidden = !msg;
+  }
 
   async function gh(path, { method = 'GET', body, raw } = {}) {
     const r = await fetch(API + path, {
@@ -477,10 +483,13 @@
     bad.forEach(x => x.classList.add('invalid'));
     if (bad.length) { $('#editError').textContent = 'Заполните обязательные поля'; bad[0].focus(); return; }
 
+    if (saving) return; // защита от повторного нажатия: каждое нажатие загружало бы фото заново
     const data = readEditor();
     const orig = cur.orig;
     const id = orig?.id || newId(data);
     const now = new Date().toISOString();
+    const submitBtn = ef.querySelector('[type=submit]');
+    saving = true; submitBtn.disabled = true;
     busy('Сохраняю…');
     try {
       // Фото из заявки пробуем перенести в репозиторий (если источник разрешает CORS)
@@ -525,11 +534,12 @@
       }
       ed.close();
       renderRows();
-      toast('Опубликовано. На сайте появится через 1–2 минуты.');
+      toast('Сохранено. На сайте изменения появятся через 1–2 минуты — повторно сохранять не нужно.');
     } catch (err) {
       $('#editError').textContent = err.message;
-    } finally { busy(); }
+    } finally { busy(); saving = false; submitBtn.disabled = false; }
   });
+  let saving = false;
 
   $('#deleteBtn').addEventListener('click', async () => {
     const l = cur.orig;
