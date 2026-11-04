@@ -483,3 +483,9 @@ body:has(#view-car:not([hidden])) .install { bottom: calc(86px + env(safe-area-i
 .adm-add { gap: 6px; }
 @media (max-width: 700px) { .adm-add .lbl { display: none; } .admbar__del { margin-left: 0; } }
 @media (max-width: 560px) { .is-admin .top .logo__word { display: none; } }
+/* Поиск на главной — всегда светлая карточка: и поля, и выпадающие списки светлые в любой теме */
+.finder { color-scheme: light; }
+.finder select:focus, .finder input:focus { background: transparent; outline: none; }
+.finder select option { background: #fff; color: #0e0e10; }
+.finder label:focus-within { background: #f1f8f3; }
+.finder label:focus-within:first-child { border-radius: 14px 0 0 14px; }
