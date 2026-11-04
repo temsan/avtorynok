@@ -1,7 +1,7 @@
 /* Админка: объявления хранятся в data/db.json репозитория, фото — в photos/. Запись — через GitHub API. */
 (function () {
   'use strict';
-  const { REPO, ENUMS, BRANDS, CITIES, fmtNum, fmtPrice, fmtDate, esc, title, safeUrl, carPlaceholder, b64encode, b64decode, store } = window.AR;
+  const { REPO, ENUMS, BRANDS, CITIES, fmtNum, fmtPrice, fmtDate, esc, title, safeUrl, carPlaceholder, b64encode, b64decode, store, spinFrames, hasSpin, mountSpin } = window.AR;
   const $ = (s, r = document) => r.querySelector(s);
   const $$ = (s, r = document) => [...r.querySelectorAll(s)];
   const API = 'https://api.github.com';
@@ -336,6 +336,8 @@
     const isNew = !l || !l.id || !db.listings.some(x => x.id === l.id);
     cur = { orig: isNew ? null : l, fromIssue, photos: (l?.photos || []).map(p => ({ value: p, src: displaySrc(p), external: /^https?:/.test(p) })) };
     if (fromIssue) cur.photos.forEach(p => (p.tryImport = true));
+    cur.spin = { orig: !isNew && hasSpin(l) ? l.spin : null, frames: null, removed: false };
+    renderSpin();
     ef.reset();
     const v = l || { status: 'active', comments: db.settings.defaultComments !== false };
     for (const el of ef.elements) {
@@ -394,6 +396,65 @@
     if (/^https?:/.test(u)) { cur.photos.push({ value: u, src: u, external: true }); e.target.value = ''; renderPhotos(); }
   });
 
+  /* ---------- Обзор 360° ---------- */
+  let spinView = null;
+  const pad2 = n => String(n).padStart(2, '0');
+  const spinRepoFiles = s => (s?.dir && !/^https?:/.test(s.dir) ? spinFrames(s).flat() : []);
+  function renderSpin() {
+    spinView?.destroy(); spinView = null;
+    const sp = cur.spin, box = $('#spinPrev');
+    box.replaceWith(box.cloneNode(false)); // чистый элемент без старых обработчиков
+    const el = $('#spinPrev');
+    let spec = null, info = '';
+    if (sp.frames) { spec = { frames: [sp.frames] }; info = `Новый обзор: ${sp.frames.length} кадров — сохранится вместе с объявлением.`; }
+    else if (sp.orig && !sp.removed) {
+      spec = { ...sp.orig, frames: spinFrames(sp.orig).map(r => r.map(displaySrc)) };
+      info = `Обзор: ${sp.orig.cols} кадров${(sp.orig.rows || 1) > 1 ? ` × ${sp.orig.rows} ряда` : ''}.`;
+    } else if (sp.removed) info = 'Обзор будет удалён при сохранении.';
+    el.hidden = !spec;
+    if (spec) spinView = mountSpin(el, spec, { intro: false });
+    $('#spinInfo').textContent = info;
+    $('#spinDel').hidden = !spec;
+  }
+  ed.addEventListener('close', () => { spinView?.destroy(); spinView = null; });
+
+  async function videoFrames(file, n, max = 1280) {
+    const v = document.createElement('video');
+    v.muted = true; v.playsInline = true; v.preload = 'auto'; v.src = URL.createObjectURL(file);
+    try {
+      await new Promise((res, rej) => { v.onloadeddata = res; v.onerror = () => rej(new Error('Браузер не может прочитать это видео. Попробуйте MP4 (H.264) или другой браузер.')); });
+      const d = v.duration;
+      if (!isFinite(d) || d <= 0) throw new Error('Не удалось определить длину видео');
+      const k = Math.min(1, max / Math.max(v.videoWidth, v.videoHeight));
+      const c = document.createElement('canvas'); c.width = Math.round(v.videoWidth * k); c.height = Math.round(v.videoHeight * k);
+      const ctx = c.getContext('2d'), out = [];
+      for (let i = 0; i < n; i++) {
+        await new Promise((res, rej) => { const t = setTimeout(() => rej(new Error('Видео перематывается слишком медленно')), 8000); v.onseeked = () => { clearTimeout(t); res(); }; v.currentTime = Math.min(d - 0.05, d * i / n); });
+        ctx.drawImage(v, 0, 0, c.width, c.height);
+        out.push(c.toDataURL('image/jpeg', 0.82));
+        busy(`Кадры из видео: ${i + 1} / ${n}`);
+      }
+      return out;
+    } finally { URL.revokeObjectURL(v.src); }
+  }
+  $('#spinVideo').addEventListener('change', async e => {
+    const f = e.target.files[0]; e.target.value = ''; if (!f) return;
+    busy('Читаю видео…');
+    try { cur.spin.frames = await videoFrames(f, +$('#spinCount').value); renderSpin(); }
+    catch (err) { toast(err.message, true); } finally { busy(); }
+  });
+  $('#spinPhotos').addEventListener('change', async e => {
+    const files = [...e.target.files].filter(f => f.type.startsWith('image/'))
+      .sort((a, b) => a.name.localeCompare(b.name, undefined, { numeric: true })); e.target.value = '';
+    if (files.length < 8) { if (files.length) toast('Для обзора нужно хотя бы 8 фото по кругу', true); return; }
+    try {
+      const out = [];
+      for (const [i, f] of files.entries()) { busy(`Обрабатываю кадры: ${i + 1} / ${files.length}`); out.push(await fileToJpegB64(f, 1280)); }
+      cur.spin.frames = out; renderSpin();
+    } catch { toast('Не удалось прочитать часть фото — сохраните их как JPG', true); } finally { busy(); }
+  });
+  $('#spinDel').addEventListener('click', () => { cur.spin.frames = null; cur.spin.removed = !!cur.spin.orig; renderSpin(); });
+
   function readEditor() {
     const d = Object.fromEntries(new FormData(ef));
     const num = k => (d[k] === '' || d[k] == null ? undefined : Number(d[k]));
@@ -442,6 +503,14 @@
 
       const listing = { id, ...data, photos, created: orig?.created || now, updated: now, issue: orig?.issue || null };
       if (orig?.credits) listing.credits = orig.credits.filter(c => photos.includes(c.file));
+      // обзор 360°: новые кадры кладём в свою папку, старые удаляем
+      const sp = cur.spin;
+      if (sp.frames) {
+        const dir = `photos/${id}/360-${stamp}`;
+        sp.frames.forEach((d, c) => files.push({ path: `${dir}/0-${pad2(c)}.jpg`, base64: d.split(',')[1] }));
+        listing.spin = { dir, cols: sp.frames.length, rows: 1 };
+      } else if (sp.orig && !sp.removed) listing.spin = sp.orig;
+      if (sp.orig && (sp.frames || sp.removed)) spinRepoFiles(sp.orig).forEach(path => files.push({ path, delete: true }));
       busy('Обсуждение…');
       listing.issue = await syncDiscussion(listing, orig || { comments: true });
       busy(`Публикую${files.length ? ` (${files.filter(f => !f.delete).length} фото)` : ''}…`);
@@ -467,7 +536,7 @@
     if (!l || !confirm(`Удалить «${title(l)}, ${l.year}» вместе с фото? Это нельзя отменить.`)) return;
     busy('Удаляю…');
     try {
-      const files = (l.photos || []).filter(p => !/^https?:/.test(p)).map(p => ({ path: p, delete: true }));
+      const files = [...(l.photos || []).filter(p => !/^https?:/.test(p)), ...spinRepoFiles(l.spin)].map(p => ({ path: p, delete: true }));
       await mutate(`Удалено: ${title(l)}, ${l.year}`, d => { d.listings = d.listings.filter(x => x.id !== l.id); }, files);
       await closeDiscussion(l.issue);
       ed.close(); renderRows(); toast('Объявление удалено.');

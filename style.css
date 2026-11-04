@@ -427,3 +427,41 @@ body:has(#view-car:not([hidden])) .install { bottom: calc(86px + env(safe-area-i
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; transition: none !important; }
 }
+
+/* ===== Обзор 360° ===== */
+.bdg--360 { background: var(--accent); color: #fff; letter-spacing: .02em; }
+.viewtabs { display: inline-flex; gap: 4px; padding: 4px; margin: 0 0 12px; background: var(--surface); border: 1px solid var(--line); border-radius: 14px; }
+.viewtabs button { display: inline-flex; align-items: center; gap: 8px; padding: .55em 1em; border: 0; border-radius: 10px; background: transparent; font-weight: 700; font-size: .9rem; cursor: pointer; color: var(--ink-2); }
+.viewtabs button svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.viewtabs__360 b { display: inline-grid; place-items: center; padding: 1px 7px; border-radius: 7px; background: var(--accent); color: #fff; font-size: .8rem; }
+.viewtabs button[aria-selected="true"] { background: var(--ink); color: var(--bg); }
+.spin-box { aspect-ratio: 16/10; max-height: 640px; border-radius: 20px; }
+.spin { position: relative; overflow: hidden; background: var(--surface-2); cursor: grab; user-select: none; -webkit-user-select: none; outline: none; }
+.spin:focus-visible { box-shadow: inset 0 0 0 3px var(--accent); }
+.spin.grab { cursor: grabbing; }
+.spin canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+.spin__load { position: absolute; inset: 0; display: grid; place-content: center; justify-items: center; gap: 10px; color: #3a3a40; font-weight: 700; font-size: .9rem; pointer-events: none; }
+.spin__load i { --p: 0; width: 54px; height: 54px; border-radius: 50%; background: conic-gradient(var(--accent) calc(var(--p) * 1%), rgba(0,0,0,.1) 0); -webkit-mask: radial-gradient(circle, transparent 58%, #000 60%); mask: radial-gradient(circle, transparent 58%, #000 60%); }
+.spin__hint { position: absolute; left: 50%; bottom: 18px; transform: translateX(-50%); display: flex; align-items: center; gap: 8px; padding: 8px 14px; border-radius: 999px; background: rgba(14,14,16,.78); color: #fff; font-weight: 700; font-size: .85rem; white-space: nowrap; pointer-events: none; opacity: 0; transition: opacity .4s; }
+.spin__hint svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; animation: spin-nudge 1.6s var(--ease) infinite; }
+.spin.ready:not(.used) .spin__hint { opacity: 1; }
+@keyframes spin-nudge { 0%, 100% { transform: translateX(-4px); } 50% { transform: translateX(4px); } }
+.spin__ctl { position: absolute; right: 14px; top: 14px; display: flex; gap: 8px; }
+.spin__ctl button { width: 42px; height: 42px; display: grid; place-items: center; border: 0; border-radius: 12px; background: rgba(255,255,255,.92); color: #0e0e10; cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,.12); }
+.spin__ctl button[aria-pressed="true"] { background: var(--accent); color: #fff; }
+.spin__ctl svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+.spin__badge { position: absolute; left: 14px; top: 14px; padding: 4px 10px; border-radius: 9px; background: var(--accent); color: #fff; font-weight: 800; font-size: .85rem; pointer-events: none; }
+.spin__rows { position: absolute; left: 16px; top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; gap: 6px; pointer-events: none; }
+.spin__rows i { width: 6px; height: 18px; border-radius: 3px; background: rgba(14,14,16,.2); transition: background .2s; }
+.spin__rows i.on { background: var(--accent); }
+.spin--dark .spin__load { color: #fff; }
+.spin--dark .spin__rows i { background: rgba(255,255,255,.3); }
+.spin:fullscreen { border-radius: 0; }
+.spin--full { position: fixed !important; inset: 0; z-index: 200; height: auto !important; border-radius: 0 !important; }
+.spin-lock, .spin-lock body { overflow: hidden; }
+.spin-note[hidden] { display: none; }
+@media (max-width: 700px) {
+  .spin-box { height: auto; aspect-ratio: 4/3; border-radius: 0; margin: 0 -16px; }
+  .viewtabs { display: flex; }
+  .viewtabs button { flex: 1; justify-content: center; }
+}

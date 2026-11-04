@@ -1,7 +1,7 @@
 /* Публичная часть: каталог, страница автомобиля, сравнение, избранное, подача объявления */
 (function () {
   'use strict';
-  const { REPO, ENUMS, BRANDS, CITIES, SPECS, fmtNum, fmtPrice, fmtDate, esc, plural, title, safeUrl, contactLink, carPlaceholder, store, commentsOn, loadPublicDb } = window.AR;
+  const { REPO, ENUMS, BRANDS, CITIES, SPECS, fmtNum, fmtPrice, fmtDate, esc, plural, title, safeUrl, contactLink, carPlaceholder, store, commentsOn, loadPublicDb, hasSpin, mountSpin } = window.AR;
   const $ = (s, r = document) => r.querySelector(s);
   const $$ = (s, r = document) => [...r.querySelectorAll(s)];
 
@@ -226,7 +226,7 @@
     const ph = photosOf(l);
     const sold = l.status === 'sold';
     const fav = favs.has(l.id), inCmp = cmp.includes(l.id);
-    const badges = [sold ? '<span class="bdg bdg--sold">Продано</span>' : '', !sold && isNew(l) ? '<span class="bdg bdg--new">Новое</span>' : '', l.owners === 1 ? '<span class="bdg">1 владелец</span>' : ''].join('');
+    const badges = [sold ? '<span class="bdg bdg--sold">Продано</span>' : '', !sold && isNew(l) ? '<span class="bdg bdg--new">Новое</span>' : '', l.owners === 1 ? '<span class="bdg">1 владелец</span>' : '', hasSpin(l) ? '<span class="bdg bdg--360">360°</span>' : ''].join('');
     return `<article class="card${sold ? ' card--sold' : ''}" data-id="${esc(l.id)}">
       <a class="card__link" href="#/car/${encodeURIComponent(l.id)}">
         <div class="card__img" data-photos="${esc(JSON.stringify(ph.slice(0, 5)))}">
@@ -383,6 +383,9 @@
     const sold = l.status === 'sold';
     const fav = favs.has(l.id), inCmp = cmp.includes(l.id);
     const n = ph.length, shown = Math.min(n, 5);
+    const spin = hasSpin(l) ? l.spin : null;
+    const sc = spin?.credit;
+    const spinCredit = spin && (spin.note || sc) ? `<p class="credits spin-note" id="spinNote" hidden>${spin.note ? esc(spin.note) + ' ' : ''}${sc ? `Модель: ${sc.source ? `<a href="${esc(safeUrl(sc.source))}" target="_blank" rel="noopener">${esc(sc.text || 'источник')}</a>` : esc(sc.text || '')}${sc.license ? ', ' + esc(sc.license) : ''}` : ''}</p>` : '';
     const mosaicCls = n >= 5 ? '' : ` mosaic--${n}`;
     const tiles = [
       ['cal', 'Год', l.year], ['km', 'Пробег', fmtNum(l.mileage) + ' км'],
@@ -417,14 +420,19 @@
             <button class="icon-btn" data-share title="Поделиться">${icon('share')}</button>
           </div>`}
         </div>
+        ${spin ? `<div class="viewtabs" role="tablist" aria-label="Вид">
+          <button type="button" role="tab" data-vt="photo" aria-selected="true">${icon('photo')}Фото · ${n}</button>
+          <button type="button" role="tab" data-vt="spin" aria-selected="false" class="viewtabs__360"><b>360°</b>Обзор</button>
+        </div>` : ''}
         <div class="mosaic-wrap">
           ${sold ? '<span class="bdg bdg--sold car-sold">Продано</span>' : ''}
+          ${spin ? '<div class="spin-box" id="spinBox" hidden></div>' : ''}
           <div class="mosaic${mosaicCls}">
             ${ph.slice(0, shown).map((p, i) => `<button type="button" data-lb="${i}" aria-label="Открыть фото ${i + 1}"><img src="${esc(p)}" alt="${esc(title(l))}, фото ${i + 1}" ${i ? 'loading="lazy"' : ''}>${i === shown - 1 && n > shown ? `<span class="mosaic__more">+${n - shown} фото</span>` : ''}</button>`).join('')}
           </div>
           ${n > 1 ? `<button type="button" class="btn btn--sm mosaic__all" data-lb="0">${icon('photo')}Все фото · ${n}</button>` : ''}
         </div>
-        ${credits}
+        ${credits}${spinCredit}
 
         <div class="car-layout">
           <div>
@@ -483,7 +491,19 @@
     });
     calc();
 
+    let spinView = null;
+    const setView = v => {
+      const root = $('#view-car'), isSpin = v === 'spin';
+      $$('[data-vt]', root).forEach(b => b.setAttribute('aria-selected', b.dataset.vt === v));
+      $('#spinBox').hidden = !isSpin;
+      $('.mosaic', root).hidden = isSpin;
+      $$('.mosaic__all', root).forEach(b => (b.hidden = isSpin));
+      if ($('#spinNote')) $('#spinNote').hidden = !isSpin;
+      if (isSpin && !spinView) spinView = mountSpin($('#spinBox'), spin);
+      if (isSpin) $('#spinBox').focus({ preventScroll: true });
+    };
     $('#view-car').onclick = e => {
+      const vt = e.target.closest('[data-vt]'); if (vt) return setView(vt.dataset.vt);
       const lb = e.target.closest('[data-lb]'); if (lb) return openLightbox(ph, +lb.dataset.lb, title(l));
       if (e.target.closest('[data-share]')) return share(l);
       const cb = e.target.closest('[data-crumb-brand]'); if (cb) { resetFilters(); setBrand(cb.dataset.crumbBrand); render(); }

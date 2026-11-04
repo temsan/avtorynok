@@ -180,7 +180,19 @@
       "issue": 3,
       "created": "2026-10-31T10:00:00.000Z",
       "updated": "2026-10-31T10:00:00.000Z",
-      "vin": "Z94CU41DBGR3*****"
+      "vin": "Z94CU41DBGR3*****",
+      "spin": {
+        "dir": "photos/solaris-2016/360-demo",
+        "cols": 36,
+        "rows": 3,
+        "row": 0,
+        "note": "Демонстрация обзора 360° на 3D-модели — это не тот автомобиль, что продаётся. Свой обзор можно загрузить в админке из видео или серии фото.",
+        "credit": {
+          "text": "Car Concept, Khronos Group (на основе модели Unity Fan, CC0)",
+          "source": "https://github.com/KhronosGroup/glTF-Sample-Assets/tree/main/Models/CarConcept",
+          "license": "CC BY 4.0"
+        }
+      }
     },
     {
       "id": "vesta-2021",
