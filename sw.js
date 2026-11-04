@@ -1,6 +1,6 @@
 /* Service worker Авторынка: установка на главный экран и работа без сети */
-const VERSION = 'ar-v8';
-const CORE = ['./', 'index.html', 'style.css?v=8', 'common.js?v=8', 'app.js?v=8', 'manifest.webmanifest', 'icons/icon-192.png', 'icons/icon-512.png'];
+const VERSION = 'ar-v9';
+const CORE = ['./', 'index.html', 'style.css?v=8', 'common.js?v=8', 'app.js?v=9', 'manifest.webmanifest', 'icons/icon-192-g.png', 'icons/icon-512-g.png'];
 
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(VERSION).then(c => c.addAll(CORE)).then(() => self.skipWaiting()));
@@ -16,7 +16,7 @@ self.addEventListener('fetch', e => {
   if (url.pathname.endsWith('/admin.html') || url.pathname.endsWith('/admin.js') || url.pathname.includes('/data/admins.json')) return;
 
   // Страницы и база объявлений — сначала сеть (свежие данные), без сети — из кеша
-  if (req.mode === 'navigate' || url.pathname.endsWith('/data/db.json')) {
+  if (req.mode === 'navigate' || url.pathname.endsWith("/data/db.json") || url.pathname.endsWith("/manifest.webmanifest")) {
     const key = req.mode === 'navigate' ? './' : new Request(url.origin + url.pathname);
     e.respondWith(fetch(req).then(res => {
       if (res.ok) { const copy = res.clone(); caches.open(VERSION).then(c => c.put(key, copy)); }

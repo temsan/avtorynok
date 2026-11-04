@@ -13,13 +13,13 @@
   "theme_color": "#0e0e10",
   "categories": ["shopping", "lifestyle"],
   "icons": [
-    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
-    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
-    { "src": "icons/maskable-192.png", "sizes": "192x192", "type": "image/png", "purpose": "maskable" },
-    { "src": "icons/maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+    { "src": "icons/icon-192-g.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-512-g.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icons/maskable-192-g.png", "sizes": "192x192", "type": "image/png", "purpose": "maskable" },
+    { "src": "icons/maskable-512-g.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
   ],
   "shortcuts": [
-    { "name": "Продать авто", "short_name": "Продать", "url": "./#/sell", "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192" }] },
-    { "name": "Избранное", "url": "./#/favs", "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192" }] }
+    { "name": "Продать авто", "short_name": "Продать", "url": "./#/sell", "icons": [{ "src": "icons/icon-192-g.png", "sizes": "192x192" }] },
+    { "name": "Избранное", "url": "./#/favs", "icons": [{ "src": "icons/icon-192-g.png", "sizes": "192x192" }] }
   ]
 }

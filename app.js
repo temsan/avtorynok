@@ -779,8 +779,24 @@
 
   /* ---------- Установка на главный экран (PWA) ---------- */
   if ('serviceWorker' in navigator && location.protocol === 'https:') {
-    window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));
+    window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').then(reg => {
+      // установленное приложение может неделями не закрываться — проверяем новую версию при каждом возврате
+      document.addEventListener('visibilitychange', () => { if (!document.hidden) reg.update().catch(() => {}); });
+    }).catch(() => {}));
+    // вышла новая версия сайта → тихо перезагружаемся, если человек не в процессе (не открыт редактор/фото/форма)
+    const hadController = !!navigator.serviceWorker.controller;
+    navigator.serviceWorker.addEventListener('controllerchange', () => {
+      if (!hadController || reloadPending) return;
+      reloadPending = true;
+      const tryReload = () => {
+        const busy = $('#lightbox').open || (ADM.frame && !ADM.frame.hidden) || location.hash === '#/sell' || $('#spinBox')?.hidden === false;
+        if (busy) return setTimeout(tryReload, 5000);
+        location.reload();
+      };
+      tryReload();
+    });
   }
+  let reloadPending = false;
   (function installPrompt() {
     const standalone = matchMedia('(display-mode: standalone)').matches || navigator.standalone;
     if (standalone) return;
