@@ -9,7 +9,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css?v=10">
+<link rel="stylesheet" href="style.css?v=11">
 <style>
   .adm { padding: 28px 16px 64px; }
   .login { max-width: 560px; margin: 48px auto; background: var(--surface); padding: 28px; border-radius: var(--radius); box-shadow: var(--shadow); display: flex; flex-direction: column; gap: 14px; }
@@ -235,6 +235,7 @@
       <p style="margin:0 0 6px;font-weight:600;color:var(--muted);font-size:.85rem">Обзор 360° <span class="muted">— покупатель сможет покрутить машину пальцем или мышью</span></p>
       <div class="spin-prev" id="spinPrev" hidden></div>
       <p class="muted small" id="spinInfo" style="margin:6px 0"></p>
+      <div id="spinSrc" hidden></div>
       <div class="spin-ed__acts">
         <label class="btn btn--ghost btn--sm">Из видео<input type="file" id="spinVideo" accept="video/*" hidden></label>
         <label class="btn btn--ghost btn--sm">Из серии фото<input type="file" id="spinPhotos" accept="image/*" multiple hidden></label>
@@ -260,6 +261,6 @@
 <div class="toast" id="toast" hidden></div>
 
 <script src="common.js?v=8"></script>
-<script src="admin.js?v=10"></script>
+<script src="admin.js?v=11"></script>
 </body>
 </html>

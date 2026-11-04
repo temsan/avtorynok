@@ -489,3 +489,10 @@ body:has(#view-car:not([hidden])) .install { bottom: calc(86px + env(safe-area-i
 .finder select option { background: #fff; color: #0e0e10; }
 .finder label:focus-within { background: #f1f8f3; }
 .finder label:focus-within:first-child { border-radius: 14px 0 0 14px; }
+/* Видео для обзора 360°: подсказка в форме заявки и видео из заявки в редакторе */
+.sell__how summary { cursor: pointer; color: var(--accent); font-weight: 600; }
+.sell__how ol { margin: 8px 0; padding-left: 1.3em; display: grid; gap: 4px; }
+.sell__how p { margin: 0; }
+.spin-src { display: flex; align-items: center; flex-wrap: wrap; gap: 8px 12px; padding: 8px 12px; margin: 6px 0; border-radius: 12px; background: var(--accent-soft); font-size: .85rem; }
+.spin-src span { font-weight: 600; }
+.spin-src .btn { margin-left: auto; }

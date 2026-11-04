@@ -379,7 +379,7 @@
     const isNew = !l || !l.id || !db.listings.some(x => x.id === l.id);
     cur = { orig: isNew ? null : l, fromIssue, photos: (l?.photos || []).map(p => ({ value: p, src: displaySrc(p), external: /^https?:/.test(p) })) };
     if (fromIssue) cur.photos.forEach(p => (p.tryImport = true));
-    cur.spin = { orig: !isNew && hasSpin(l) ? l.spin : null, frames: null, removed: false };
+    cur.spin = { orig: !isNew && hasSpin(l) ? l.spin : null, frames: null, removed: false, videos: fromIssue ? l.videos || [] : [] };
     renderSpin();
     ef.reset();
     const v = l || { status: 'active', comments: db.settings.defaultComments !== false };
@@ -458,7 +458,27 @@
     if (spec) spinView = mountSpin(el, spec, { intro: false });
     $('#spinInfo').textContent = info;
     $('#spinDel').hidden = !spec;
+    // видео из заявки продавца
+    const src = $('#spinSrc');
+    src.hidden = !sp.videos.length || !!sp.frames;
+    src.innerHTML = sp.videos.map((u, i) => `<div class="spin-src"><span>Видео из заявки</span>
+      <a href="${esc(u)}" target="_blank" rel="noopener">открыть</a>
+      <button type="button" class="btn btn--accent btn--sm" data-vid="${i}">Сделать обзор 360°</button></div>`).join('');
   }
+  $('#spinSrc').addEventListener('click', async e => {
+    const b = e.target.closest('[data-vid]'); if (!b) return;
+    const u = cur.spin.videos[+b.dataset.vid];
+    busy('Скачиваю видео…');
+    let blob;
+    try { const r = await fetch(u); if (!r.ok) throw 0; blob = await r.blob(); if (blob.type && !/^video\//.test(blob.type)) throw 0; }
+    catch {
+      busy();
+      toast('Видео не скачивается напрямую. Нажмите «открыть», сохраните файл и выберите его кнопкой «Из видео».', true);
+      return;
+    }
+    try { cur.spin.frames = await videoFrames(blob, +$('#spinCount').value); renderSpin(); }
+    catch (err) { toast(err.message, true); } finally { busy(); }
+  });
   ed.addEventListener('close', () => { spinView?.destroy(); spinView = null; toParent({ type: 'closed' }); });
 
   async function videoFrames(file, n, max = 1280) {
@@ -614,14 +634,19 @@
     if (m) { try { data = JSON.parse(m[1]); } catch { /* битый JSON */ } }
     const imgs = new Set((data.photos || []).map(safeUrl).filter(Boolean));
     for (const x of body.matchAll(/!\[[^\]]*]\((https?:[^)\s]+)\)|<img[^>]+src="(https?:[^"]+)"/g)) imgs.add(x[1] || x[2]);
-    for (const x of body.matchAll(/https:\/\/github\.com\/user-attachments\/assets\/[\w-]+/g)) imgs.add(x[0]);
+    // Видео: ссылка из формы, файлы .mp4/.mov и вложения GitHub, вставленные голой ссылкой
+    // (картинки GitHub вставляет как ![…](…) или <img>, а видео — просто адресом на отдельной строке)
+    const videos = new Set([safeUrl(data.video || '')].filter(u => /^https?:/.test(u)));
+    for (const x of body.matchAll(/https?:\/\/[^\s)"'<>]+\.(?:mp4|mov|webm|m4v)\b[^\s)"'<>]*/gi)) videos.add(x[0]);
+    for (const x of body.matchAll(/https:\/\/github\.com\/user-attachments\/assets\/[\w-]+/g)) if (!imgs.has(x[0])) videos.add(x[0]);
+    videos.forEach(v => imgs.delete(v));
     const pick = (k, list) => (list.includes(data[k]) ? data[k] : '');
     return {
       brand: data.brand || '', model: data.model || '', year: data.year, mileage: data.mileage, price: data.price,
       transmission: pick('transmission', ENUMS.transmission), fuel: pick('fuel', ENUMS.fuel), body: pick('body', ENUMS.body),
       engine: data.engine, power: data.power, drive: pick('drive', ENUMS.drive), color: data.color, city: data.city,
       description: data.description || body.replace(/```json[\s\S]*?```/, '').trim(),
-      seller: data.seller, contact: data.contact, photos: [...imgs], status: 'active',
+      seller: data.seller, contact: data.contact, photos: [...imgs], videos: [...videos], status: 'active',
       comments: db.settings.defaultComments !== false,
     };
   }
@@ -636,7 +661,7 @@
         return `<div class="row" data-n="${is.number}">
           <img src="${esc(p.photos[0] || carPlaceholder(is.number))}" alt="" loading="lazy">
           <div><h3>${esc(is.title.replace(/^\[Объявление]\s*/, ''))}</h3>
-            <p>от ${esc(is.user.login)} · ${fmtDate(is.created_at)} · ${p.photos.length} фото · ${esc(p.city || '')}</p></div>
+            <p>от ${esc(is.user.login)} · ${fmtDate(is.created_at)} · ${p.photos.length} фото${p.videos.length ? ' · видео 360°' : ''} · ${esc(p.city || '')}</p></div>
           <div class="row__ctl">
             <a class="btn btn--ghost btn--sm" href="${esc(is.html_url)}" target="_blank" rel="noopener">На GitHub</a>
             <button class="btn btn--ghost btn--sm" data-inbox="reject">Отклонить</button>

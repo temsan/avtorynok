@@ -769,6 +769,7 @@
       drive: d.drive, color: d.color.trim(), owners: num('owners'), condition: d.condition,
       city: d.city.trim(), description: d.description.trim(),
       photos: d.photos.split(/\s+/).map(safeUrl).filter(u => /^https?:/.test(u)),
+      video: /^https?:/.test(safeUrl((d.video || '').trim())) ? safeUrl(d.video.trim()) : undefined,
       seller: d.seller.trim(), contact: d.contact.trim(),
     };
   }
@@ -786,6 +787,7 @@
       `Пробег: ${fmtNum(l.mileage)} км · ${l.transmission} · ${l.fuel} · ${l.body}`,
       `Город: ${l.city} · Продавец: ${l.seller}, ${l.contact}`, '', l.description, '',
       l.photos.length ? 'Фото:\n' + l.photos.join('\n') : '_Фото можно приложить ниже, перетащив файлы в это поле._', '',
+      l.video ? 'Видео для обзора 360°: ' + l.video : '_Видео облёта для обзора 360° тоже можно перетащить сюда (MP4)._', '',
       '<!-- данные для модератора, не удаляйте -->', '```json', JSON.stringify(l, null, 1), '```',
     ].join('\n');
   }

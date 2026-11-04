@@ -16,7 +16,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css?v=10">
+<link rel="stylesheet" href="style.css?v=11">
 </head>
 <body>
 <header class="top">
@@ -173,6 +173,17 @@
         </div>
         <label>Описание*<textarea name="description" required rows="5" maxlength="2000" placeholder="Состояние, история обслуживания, комплектация, причина продажи"></textarea></label>
         <label>Ссылки на фото <small>по одной в строке — или приложите файлы в заявке на GitHub</small><textarea name="photos" rows="2" placeholder="https://..."></textarea></label>
+        <label>Видео для обзора 360° <small>необязательно — ссылка, или перетащите файл в заявку на GitHub</small><input name="video" type="url" placeholder="https://..."></label>
+        <details class="sell__how small muted">
+          <summary>Как снять видео для обзора 360°</summary>
+          <ol>
+            <li>Поставьте машину на открытое место, чтобы её можно было обойти вокруг.</li>
+            <li>Держите телефон горизонтально на уровне фар, машина — в центре кадра.</li>
+            <li>Медленно и ровно обойдите её <b>ровно один круг</b> за 20–30 секунд, начните и закончите в одной точке.</li>
+            <li>На iPhone перед съёмкой: Настройки → Камера → Форматы → «Наиболее совместимый». Качество 720p или 1080p — файл получится меньше.</li>
+          </ol>
+          <p>Покупатель сможет покрутить вашу машину пальцем. Если файл не прикрепляется к заявке (у GitHub ограничение по размеру), загрузите его на Яндекс Диск или Google Диск и вставьте ссылку выше.</p>
+        </details>
         <h2 class="form-sec">Контакты</h2>
         <div class="row3">
           <label>Город*<input name="city" required list="cityList" placeholder="Москва"></label>
@@ -213,6 +224,6 @@
 </footer>
 
 <script src="common.js?v=8"></script>
-<script src="app.js?v=11"></script>
+<script src="app.js?v=12"></script>
 </body>
 </html>
