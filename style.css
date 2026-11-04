@@ -355,6 +355,20 @@ legend { font-size: .82rem; font-weight: 600; color: var(--muted); margin-bottom
 .foot p { margin: 0; max-width: 70ch; }
 .foot a:not(.logo) { color: rgba(255,255,255,.85); }
 
+/* ===== Плашка установки ===== */
+.install { position: fixed; left: 16px; right: 16px; bottom: calc(16px + env(safe-area-inset-bottom)); z-index: 60; max-width: 520px; margin: 0 auto; display: flex; align-items: center; gap: 12px; padding: 12px 12px 12px 14px; background: var(--dark); color: #fff; border-radius: 18px; box-shadow: var(--shadow-l); animation: slideUp .45s var(--ease) both; }
+.install img { border-radius: 12px; flex: none; }
+.install__text { flex: 1; min-width: 0; display: flex; flex-direction: column; line-height: 1.3; }
+.install__text b { font-size: .98rem; }
+.install__text span { font-size: .8rem; color: rgba(255,255,255,.65); }
+.install__close { width: 32px; height: 32px; flex: none; border: 0; border-radius: 50%; background: rgba(255,255,255,.1); color: #fff; cursor: pointer; }
+.install--ios #installBtn { display: none; }
+@media (max-width: 480px) { .install { flex-wrap: wrap; } .install img { width: 42px; height: 42px; } .install__text { flex: 1 1 0; } #installBtn { order: 3; flex: 1 0 100%; padding: .7em; } }
+@keyframes slideUp { from { opacity: 0; transform: translateY(24px); } }
+body:has(.install:not([hidden])) .cmp-tray { display: none; }
+body:has(#view-car:not([hidden])) .install { bottom: calc(86px + env(safe-area-inset-bottom)); }
+@media (display-mode: standalone) { .install { display: none !important; } .top { padding-top: env(safe-area-inset-top); } }
+
 /* ===== Адаптив ===== */
 @media (max-width: 1100px) {
   .car-layout { grid-template-columns: 1fr 340px; gap: 28px; }

@@ -609,4 +609,41 @@
     preview = { ...readForm(), id: '__preview', created: new Date().toISOString(), status: 'active' };
     location.hash = '#/car/__preview';
   });
+
+  /* ---------- Установка на главный экран (PWA) ---------- */
+  if ('serviceWorker' in navigator && location.protocol === 'https:') {
+    window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));
+  }
+  (function installPrompt() {
+    const standalone = matchMedia('(display-mode: standalone)').matches || navigator.standalone;
+    if (standalone) return;
+    const box = $('#install');
+    const snoozed = () => Date.now() < store.get('ar:installSnooze', 0);
+    const hide = (snoozeDays) => { box.hidden = true; if (snoozeDays) store.set('ar:installSnooze', Date.now() + snoozeDays * 864e5); };
+    let deferred = null;
+
+    window.addEventListener('beforeinstallprompt', e => {
+      e.preventDefault();           // показываем свою плашку вместо стандартной мини-панели
+      deferred = e;
+      if (!snoozed()) setTimeout(() => { if (deferred) box.hidden = false; }, 3000);
+    });
+    $('#installBtn').addEventListener('click', async () => {
+      if (!deferred) return;
+      box.hidden = true;
+      deferred.prompt();
+      const { outcome } = await deferred.userChoice;
+      deferred = null;
+      if (outcome !== 'accepted') hide(7);
+    });
+    $('#installClose').addEventListener('click', () => hide(14));
+    window.addEventListener('appinstalled', () => { hide(); deferred = null; toast('Авторынок установлен на главный экран'); });
+
+    // iPhone/iPad: установка только вручную через «Поделиться»
+    const ios = /iphone|ipad|ipod/i.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+    if (ios && !snoozed()) setTimeout(() => {
+      box.classList.add('install--ios');
+      $('#installHint').textContent = '«Поделиться» ⬆︎ → «На экран „Домой“»';
+      box.hidden = false;
+    }, 6000);
+  })();
 })();

@@ -6,11 +6,17 @@
 <title>Авторынок — объявления о продаже автомобилей</title>
 <meta name="description" content="Авторынок: площадка объявлений о продаже автомобилей от владельцев. Фото, характеристики, сравнение, расчёт кредита.">
 <meta name="theme-color" content="#0e0e10">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Авторынок">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23ff5a1f'/%3E%3Cpath d='M7 19l2.5-6h13l2.5 6v4H7z' fill='%23fff'/%3E%3Ccircle cx='11' cy='23' r='2.5' fill='%23161616'/%3E%3Ccircle cx='21' cy='23' r='2.5' fill='%23161616'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css?v=3">
+<link rel="stylesheet" href="style.css?v=4">
 </head>
 <body>
 <header class="top">
@@ -187,6 +193,15 @@
 
 <div class="cmp-tray" id="cmpTray" hidden></div>
 <dialog id="lightbox" class="lightbox"></dialog>
+<div class="install" id="install" role="dialog" aria-labelledby="installTitle" hidden>
+  <img src="icons/icon-192.png" alt="" width="48" height="48">
+  <div class="install__text">
+    <b id="installTitle">Установите Авторынок</b>
+    <span id="installHint">Быстрый доступ с главного экрана</span>
+  </div>
+  <button class="btn btn--accent btn--sm" type="button" id="installBtn">Установить</button>
+  <button class="install__close" type="button" id="installClose" aria-label="Не сейчас">✕</button>
+</div>
 <div class="toast" id="toast" hidden></div>
 
 <footer class="foot">
@@ -197,7 +212,7 @@
   </div>
 </footer>
 
-<script src="common.js?v=3"></script>
-<script src="app.js?v=3"></script>
+<script src="common.js?v=4"></script>
+<script src="app.js?v=4"></script>
 </body>
 </html>
