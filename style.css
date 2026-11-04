@@ -7,10 +7,10 @@
   --ink-2: #3a3a40;
   --muted: #74747c;
   --line: #e3e3de;
-  --accent: #ff5a1f;
-  --accent-hover: #ec4a10;
+  --accent: #12a150;
+  --accent-hover: #0d8a43;
   --accent-ink: #ffffff;
-  --accent-soft: #fff0e8;
+  --accent-soft: #e3f6ea;
   --dark: #0e0e10;
   --dark-2: #1a1a1e;
   --ok: #138a4a;
@@ -26,18 +26,18 @@
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
     --bg: #0b0b0d; --surface: #151518; --surface-2: #1e1e22; --ink: #f2f2ef; --ink-2: #cfcfca; --muted: #8e8e96; --line: #26262b;
-    --accent-soft: #2e1a12; --ok-soft: #10261a; --shadow: 0 6px 20px -10px rgba(0,0,0,.7); --shadow-l: 0 24px 48px -20px rgba(0,0,0,.8); color-scheme: dark;
+    --accent-soft: #0f2a1a; --ok-soft: #10261a; --shadow: 0 6px 20px -10px rgba(0,0,0,.7); --shadow-l: 0 24px 48px -20px rgba(0,0,0,.8); color-scheme: dark;
   }
 }
 :root[data-theme="dark"] {
   --bg: #0b0b0d; --surface: #151518; --surface-2: #1e1e22; --ink: #f2f2ef; --ink-2: #cfcfca; --muted: #8e8e96; --line: #26262b;
-  --accent-soft: #2e1a12; --ok-soft: #10261a; --shadow: 0 6px 20px -10px rgba(0,0,0,.7); --shadow-l: 0 24px 48px -20px rgba(0,0,0,.8); color-scheme: dark;
+  --accent-soft: #0f2a1a; --ok-soft: #10261a; --shadow: 0 6px 20px -10px rgba(0,0,0,.7); --shadow-l: 0 24px 48px -20px rgba(0,0,0,.8); color-scheme: dark;
 }
 
 /* ===== База ===== */
 * { box-sizing: border-box; }
-html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
-body { margin: 0; background: var(--bg); color: var(--ink); font: 16px/1.5 Onest, system-ui, -apple-system, sans-serif; -webkit-font-smoothing: antialiased; }
+html { font-size: 112.5%; -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 1rem/1.5 Onest, system-ui, -apple-system, sans-serif; -webkit-font-smoothing: antialiased; }
 h1, h2, h3 { line-height: 1.1; margin: 0 0 .5em; letter-spacing: -.025em; font-weight: 800; }
 a { color: inherit; }
 img { max-width: 100%; display: block; }
@@ -76,9 +76,9 @@ svg { flex: none; }
 /* ===== Шапка ===== */
 .top { position: sticky; top: 0; z-index: 30; background: rgba(14,14,16,.92); backdrop-filter: saturate(1.4) blur(12px); -webkit-backdrop-filter: saturate(1.4) blur(12px); color: #fff; border-bottom: 1px solid rgba(255,255,255,.06); }
 .top__in { display: flex; align-items: center; justify-content: space-between; gap: 12px; height: 64px; }
-.logo { display: flex; align-items: center; gap: 10px; text-decoration: none; font-weight: 600; font-size: 1.15rem; letter-spacing: -.02em; }
+.logo { display: flex; align-items: center; gap: 10px; text-decoration: none; font-weight: 600; font-size: 1.3rem; letter-spacing: -.02em; }
 .logo b { color: var(--accent); font-weight: 800; }
-.logo__mark { display: grid; place-items: center; width: 34px; height: 34px; border-radius: 10px; background: var(--accent); color: #fff; font-weight: 800; }
+.logo__mark { display: grid; place-items: center; width: 40px; height: 40px; border-radius: 11px; background: var(--accent); color: #fff; font-weight: 800; }
 .top__nav { display: flex; align-items: center; gap: 6px; }
 .top__nav a:not(.btn) { display: inline-flex; align-items: center; gap: 6px; text-decoration: none; font-weight: 600; font-size: .95rem; padding: 8px 12px; border-radius: 10px; color: rgba(255,255,255,.75); transition: color .15s, background .15s; }
 .top__nav a:not(.btn):hover, .top__nav a.current { color: #fff; background: rgba(255,255,255,.08); }
@@ -88,7 +88,7 @@ svg { flex: none; }
 
 /* ===== Hero ===== */
 .hero { background: var(--dark); color: #fff; position: relative; overflow: hidden; }
-.hero::before { content: ""; position: absolute; inset: 0; background: radial-gradient(900px 500px at 85% 20%, rgba(255,90,31,.22), transparent 60%), radial-gradient(600px 400px at 0% 100%, rgba(255,255,255,.05), transparent 70%); pointer-events: none; }
+.hero::before { content: ""; position: absolute; inset: 0; background: radial-gradient(900px 500px at 85% 20%, rgba(18,161,80,.22), transparent 60%), radial-gradient(600px 400px at 0% 100%, rgba(255,255,255,.05), transparent 70%); pointer-events: none; }
 .hero__in { display: grid; grid-template-columns: 1.05fr 1fr; gap: 40px; align-items: center; padding-top: 56px; padding-bottom: 64px; position: relative; }
 .hero h1 { font-size: clamp(2.2rem, 5.2vw, 4.4rem); letter-spacing: -.04em; margin-bottom: 28px; }
 .hero h1 em { font-style: normal; color: var(--accent); }
@@ -167,7 +167,7 @@ legend { font-size: .82rem; font-weight: 600; color: var(--muted); margin-bottom
 .chip[aria-pressed="true"] { background: var(--ink); color: var(--bg); border-color: var(--ink); }
 
 .results__bar { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 18px; }
-.results__bar p { margin: 0; font-weight: 800; font-size: 1.15rem; letter-spacing: -.02em; }
+.results__bar p { margin: 0; font-weight: 800; font-size: 1.3rem; letter-spacing: -.02em; }
 .results__bar select { width: auto; margin-left: auto; background: var(--surface); }
 .active-filters { display: flex; gap: 6px; flex-wrap: wrap; }
 .af { display: inline-flex; align-items: center; gap: 6px; padding: 4px 6px 4px 12px; border-radius: 999px; background: var(--surface); border: 1px solid var(--line); font-size: .82rem; font-weight: 600; cursor: pointer; }
@@ -417,7 +417,7 @@ body:has(#view-car:not([hidden])) .install { bottom: calc(86px + env(safe-area-i
   #view-car { padding-bottom: 84px; }
   .mbar { display: flex; position: fixed; left: 0; right: 0; bottom: 0; z-index: 35; gap: 8px; align-items: center; padding: 10px 16px calc(10px + env(safe-area-inset-bottom)); background: var(--surface); border-top: 1px solid var(--line); box-shadow: 0 -10px 30px -12px rgba(0,0,0,.25); }
   .mbar__price { flex: 1; min-width: 0; }
-  .mbar__price b { display: block; font-size: 1.15rem; letter-spacing: -.02em; }
+  .mbar__price b { display: block; font-size: 1.2rem; letter-spacing: -.02em; white-space: nowrap; }
   .mbar__price span { font-size: .78rem; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: block; }
   .cmp-tray { bottom: 12px; }
   body:has(#view-car:not([hidden])) .cmp-tray { bottom: 86px; }
