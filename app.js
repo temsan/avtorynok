@@ -65,13 +65,57 @@
 
   /* ---------- Загрузка ---------- */
   $('#grid').innerHTML = Array.from({ length: 6 }, () => '<div class="skeleton"></div>').join('');
-  loadPublicDb().then(data => {
-    db = data;
-    all = db.listings.filter(l => l.status !== 'hidden');
+  // База читается мимо всех кешей (браузер, service worker, CDN GitHub Pages), чтобы правки из админки
+  // — новые фото, цены, статусы — появлялись у открытых страниц сами, без перезагрузки.
+  let dbText = '';
+  async function fetchDb() {
+    const r = await fetch('data/db.json?t=' + Date.now(), { cache: 'no-store' });
+    if (!r.ok) throw new Error('Не удалось загрузить объявления');
+    return r.text();
+  }
+  const visible = data => data.listings.filter(l => l.status !== 'hidden');
+  fetchDb().then(text => {
+    dbText = text; db = JSON.parse(text);
+    all = visible(db);
     setupCatalog();
     render();
     route();
-  }).catch(e => { $('#grid').innerHTML = `<p class="empty">${esc(e.message)}</p>`; });
+    setInterval(refresh, 60000);
+  }).catch(() => loadPublicDb().then(data => { // запасной путь — из кеша (без сети)
+    db = data; all = visible(db); setupCatalog(); render(); route();
+  })).catch(e => { $('#grid').innerHTML = `<p class="empty">${esc(e.message)}</p>`; });
+
+  /* ---------- Автообновление ---------- */
+  let refreshing = false;
+  async function refresh() {
+    if (document.hidden || refreshing || !dbText) return;
+    refreshing = true;
+    try {
+      const text = await fetchDb();
+      if (text === dbText) return;
+      const prev = new Map(all.map(l => [l.id, JSON.stringify(l)]));
+      const prevSettings = JSON.stringify(db.settings);
+      dbText = text; db = JSON.parse(text); all = visible(db);
+      const settingsChanged = prevSettings !== JSON.stringify(db.settings);
+      const changed = all.filter(l => prev.get(l.id) !== JSON.stringify(l)).length + [...prev.keys()].filter(id => !byId(id)).length;
+      if (!changed && !settingsChanged) return;
+      render(); // каталог и избранное
+      const car = location.hash.match(/^#\/car\/(.+)$/);
+      if (car && car[1] !== '__preview') {
+        const id = decodeURIComponent(car[1]), l = byId(id);
+        if (!l) { toast('Объявление снято с публикации'); location.replace('#/'); return; }
+        // перерисовываем только если поменялось это объявление и человек сейчас не листает фото / не крутит 360°
+        if ((settingsChanged || prev.get(id) !== JSON.stringify(l)) && !$('#lightbox').open && $('#spinBox')?.hidden !== false) {
+          const y = scrollY; renderCar(l); scrollTo({ top: y, behavior: 'instant' });
+          toast('Объявление обновлено');
+        }
+      } else if (location.hash === '#/compare') renderCompare();
+      else if (changed) toast('Объявления обновлены');
+      renderTray();
+    } catch { /* нет сети — попробуем позже */ } finally { refreshing = false; }
+  }
+  document.addEventListener('visibilitychange', () => { if (!document.hidden) refresh(); });
+  window.addEventListener('online', refresh);
 
   /* ---------- Каталог ---------- */
   function setupCatalog() {

@@ -535,11 +535,25 @@
       ed.close();
       renderRows();
       toast('Сохранено. На сайте изменения появятся через 1–2 минуты — повторно сохранять не нужно.');
+      watchLive(id, listing.updated);
     } catch (err) {
       $('#editError').textContent = err.message;
     } finally { busy(); saving = false; submitBtn.disabled = false; }
   });
   let saving = false;
+
+  // Ждём, пока GitHub Pages опубликует правку, и сообщаем об этом (открытые страницы сайта обновятся сами)
+  async function watchLive(id, updated) {
+    for (let i = 0; i < 40; i++) { // до ~7 минут
+      await new Promise(r => setTimeout(r, i ? 10000 : 20000));
+      try {
+        const live = await (await fetch(`${siteUrl}data/db.json?t=${Date.now()}`, { cache: 'no-store' })).json();
+        const l = live.listings.find(x => x.id === id);
+        if (l?.updated === updated) { toast('Изменения уже на сайте ✓'); return; }
+        if (l && l.updated > updated) return; // уже сохранили новее
+      } catch { /* сайт недоступен с этого адреса — просто ждём */ }
+    }
+  }
 
   $('#deleteBtn').addEventListener('click', async () => {
     const l = cur.orig;

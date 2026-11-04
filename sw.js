@@ -1,6 +1,6 @@
 /* Service worker Авторынка: установка на главный экран и работа без сети */
-const VERSION = 'ar-v6';
-const CORE = ['./', 'index.html', 'style.css?v=6', 'common.js?v=6', 'app.js?v=6', 'manifest.webmanifest', 'icons/icon-192.png', 'icons/icon-512.png'];
+const VERSION = 'ar-v7';
+const CORE = ['./', 'index.html', 'style.css?v=7', 'common.js?v=7', 'app.js?v=7', 'manifest.webmanifest', 'icons/icon-192.png', 'icons/icon-512.png'];
 
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(VERSION).then(c => c.addAll(CORE)).then(() => self.skipWaiting()));
