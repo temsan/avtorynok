@@ -27,9 +27,11 @@
       "status": "active",
       "description": "Гениратор",
       "comments": true,
-      "photos": [],
+      "photos": [
+        "photos/hyundai-solaris-2018-7zpm/mw2clg5z-0.jpg"
+      ],
       "created": "2026-11-04T16:11:06.184Z",
-      "updated": "2026-11-04T16:12:42.728Z",
+      "updated": "2026-11-04T16:45:33.320Z",
       "issue": 11
     },
     {
