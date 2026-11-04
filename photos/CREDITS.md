@@ -32,3 +32,7 @@
 - `photos/sportage/1.jpg` — автор не указан, CC BY-SA 4.0, https://commons.wikimedia.org/wiki/File:Kia_Sportage_(NQ5)_1X7A0319.jpg
 - `photos/sportage/2.jpg` — автор не указан, CC BY-SA 4.0, https://commons.wikimedia.org/wiki/File:Kia_Sportage_(NQ5)_1X7A0328.jpg
 - `photos/sportage/3.jpg` — автор не указан, CC BY-SA 4.0, https://commons.wikimedia.org/wiki/File:Kia_Sportage_(NQ5)_1X7A0326.jpg
+
+## Обзор 360° (демо)
+
+`photos/solaris-2016/360-demo/` — кадры отрендерены из 3D-модели [Car Concept](https://github.com/KhronosGroup/glTF-Sample-Assets/tree/main/Models/CarConcept), Khronos Group, лицензия CC BY 4.0 (исходная модель — Unity Fan, CC0). Это не продаваемый автомобиль, а демонстрация функции.
