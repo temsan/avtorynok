@@ -465,7 +465,7 @@
     const v = document.createElement('video');
     v.muted = true; v.playsInline = true; v.preload = 'auto'; v.src = URL.createObjectURL(file);
     try {
-      await new Promise((res, rej) => { v.onloadeddata = res; v.onerror = () => rej(new Error('Браузер не может прочитать это видео. Попробуйте MP4 (H.264) или другой браузер.')); });
+      await new Promise((res, rej) => { v.onloadeddata = res; v.onerror = () => rej(new Error('Браузер не может прочитать это видео. Нужен MP4 (H.264). На iPhone: Настройки → Камера → Форматы → «Наиболее совместимый», затем переснимите.')); });
       const d = v.duration;
       if (!isFinite(d) || d <= 0) throw new Error('Не удалось определить длину видео');
       const k = Math.min(1, max / Math.max(v.videoWidth, v.videoHeight));

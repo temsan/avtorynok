@@ -119,6 +119,7 @@
     const settingsChanged = prevSettings !== JSON.stringify(db.settings);
     const changed = all.filter(l => prev.get(l.id) !== JSON.stringify(l)).length + [...prev.keys()].filter(id => !byId(id)).length;
     if (!changed && !settingsChanged && !force) return;
+    fillCatalog(); // марки, города, кузова, счётчики, «Предложение недели»
     render(); // каталог и избранное
     const car = location.hash.match(/^#\/car\/(.+)$/);
     if (car && car[1] !== '__preview') {
@@ -219,26 +220,17 @@
   window.addEventListener('online', refresh);
 
   /* ---------- Каталог ---------- */
+  // Обработчики вешаются один раз; списки, счётчики и «Предложение недели» —
+  // fillCatalog(), её можно звать повторно (автообновление, правки админа).
+  let catalogBound = false;
   function setupCatalog() {
-    const act = all.filter(l => l.status === 'active');
-    const count = (arr, k) => arr.reduce((m, l) => m.set(l[k], (m.get(l[k]) || 0) + 1), new Map());
-    const brands = [...count(act, 'brand')].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]));
-    const opts = list => list.map(v => `<option>${esc(v)}</option>`).join('');
-    const brandNames = brands.map(b => b[0]).sort();
-    $('#f-brand').insertAdjacentHTML('beforeend', opts(brandNames));
-    $('#h-brand').insertAdjacentHTML('beforeend', opts(brandNames));
-    $('#f-city').insertAdjacentHTML('beforeend', opts([...new Set(all.map(l => l.city))].sort()));
-
-    // кузова
-    const bodies = count(act, 'body');
-    $('#bodies').innerHTML = ENUMS.body.filter(b => bodies.has(b)).map(b =>
-      `<button type="button" class="body-btn" data-body="${esc(b)}" aria-pressed="false">${bodySvg(b)}${esc(b)}<small>${bodies.get(b)}</small></button>`).join('');
+    fillCatalog();
+    if (catalogBound) return;
+    catalogBound = true;
     $('#bodies').addEventListener('click', e => {
       const b = e.target.closest('[data-body]'); if (!b) return;
       toggleSet(F.body, b.dataset.body); render();
     });
-    // марки
-    $('#brands').innerHTML = brands.map(([b, n]) => `<button type="button" class="brand-chip" data-brand="${esc(b)}" aria-pressed="false">${esc(b)}<small>${n}</small></button>`).join('');
     $('#brands').addEventListener('click', e => {
       const b = e.target.closest('[data-brand]'); if (!b) return;
       setBrand(F.brand === b.dataset.brand ? '' : b.dataset.brand); render();
@@ -264,6 +256,32 @@
     $('#filtersToggle').addEventListener('click', () => $('#filters').classList.add('open'));
     $('#filtersApply').addEventListener('click', () => { $('#filters').classList.remove('open'); $('#results').scrollIntoView(); });
     $('#activeFilters').addEventListener('click', e => { const b = e.target.closest('[data-rm]'); if (b) { removeFilter(b.dataset.rm, b.dataset.v); render(); } });
+  }
+
+  function fillCatalog() {
+    const act = all.filter(l => l.status === 'active');
+    const count = (arr, k) => arr.reduce((m, l) => m.set(l[k], (m.get(l[k]) || 0) + 1), new Map());
+    const brands = [...count(act, 'brand')].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]));
+    const fillSelect = (sel, list, keep) => {
+      const el = $(sel), first = el.options[0].outerHTML;
+      el.innerHTML = first + list.map(v => `<option>${esc(v)}</option>`).join('');
+      el.value = keep;
+    };
+    const brandNames = brands.map(b => b[0]).sort();
+    if (F.brand && !brandNames.includes(F.brand)) brandNames.push(F.brand); // выбранная марка не пропадает из списка
+    fillSelect('#f-brand', brandNames, F.brand);
+    fillSelect('#h-brand', brandNames, F.brand);
+    const cities = [...new Set(all.map(l => l.city))].sort();
+    if (F.city && !cities.includes(F.city)) cities.push(F.city);
+    fillSelect('#f-city', cities, F.city);
+    if (F.brand) fillModels(F.brand);
+
+    // кузова
+    const bodies = count(act, 'body');
+    $('#bodies').innerHTML = ENUMS.body.filter(b => bodies.has(b)).map(b =>
+      `<button type="button" class="body-btn" data-body="${esc(b)}" aria-pressed="${F.body.has(b)}">${bodySvg(b)}${esc(b)}<small>${bodies.get(b)}</small></button>`).join('');
+    // марки
+    $('#brands').innerHTML = brands.map(([b, n]) => `<button type="button" class="brand-chip" data-brand="${esc(b)}" aria-pressed="${F.brand === b}">${esc(b)}<small>${n}</small></button>`).join('');
 
     const prices = act.map(l => l.price);
     $('#stats').innerHTML = prices.length ? `
@@ -275,10 +293,16 @@
     renderRecent();
   }
 
+  let featureKey = null, featureTimer = 0;
   function setupFeature(act) {
     const picks = act.filter(l => (l.photos || []).length > 1).sort((a, b) => b.price - a.price).slice(0, 4);
     const el = $('#feature');
-    if (!picks.length) { el.hidden = true; return; }
+    const key = JSON.stringify(picks.map(l => [l.id, photosOf(l)[0], title(l), l.year, l.price]));
+    if (key === featureKey) return; // ничего не поменялось — не сбиваем слайдер
+    featureKey = key;
+    clearInterval(featureTimer);
+    el.hidden = !picks.length;
+    if (!picks.length) return;
     el.innerHTML = picks.map((l, i) => `<img src="${esc(photosOf(l)[0])}" alt="${esc(title(l))}" class="${i ? '' : 'on'}" ${i ? 'loading="lazy"' : 'fetchpriority="high"'}>`).join('') +
       `<div class="hero__dots">${picks.map((_, i) => `<i class="${i ? '' : 'on'}"></i>`).join('')}</div><div class="hero__cap"></div>`;
     let i = 0;
@@ -291,16 +315,21 @@
       el.href = `#/car/${encodeURIComponent(l.id)}`;
     };
     show(0);
-    if (picks.length > 1 && !matchMedia('(prefers-reduced-motion: reduce)').matches) setInterval(() => { if (!document.hidden && !$('#view-catalog').hidden) show(i + 1); }, 5000);
+    if (picks.length > 1 && !matchMedia('(prefers-reduced-motion: reduce)').matches) featureTimer = setInterval(() => { if (!document.hidden && !$('#view-catalog').hidden) show(i + 1); }, 5000);
   }
 
   function toggleSet(set, v) { set.has(v) ? set.delete(v) : set.add(v); }
   function setBrand(b) {
     F.brand = b; F.model = '';
+    fillModels(b);
+  }
+  function fillModels(b) {
     const models = [...new Set(all.filter(l => l.brand === b).map(l => l.model))].sort();
+    if (F.model && !models.includes(F.model)) models.push(F.model);
     for (const sel of ['#f-model', '#h-model']) {
       $(sel).innerHTML = `<option value="">${sel === '#h-model' ? 'Все модели' : 'Любая'}</option>` + models.map(m => `<option>${esc(m)}</option>`).join('');
       $(sel).disabled = !b;
+      $(sel).value = F.model;
     }
   }
   function resetFilters() {

@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex">
 <title>Авторынок — админка</title>
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23161616'/%3E%3Cpath d='M7 19l2.5-6h13l2.5 6v4H7z' fill='%2312a150'/%3E%3C/svg%3E">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%2312a150'/%3E%3Cpath d='M7 19l2.5-6h13l2.5 6v4H7z' fill='%23fff'/%3E%3Ccircle cx='11' cy='23' r='2.5' fill='%23161616'/%3E%3Ccircle cx='21' cy='23' r='2.5' fill='%23161616'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -99,6 +99,7 @@
       <label>Логин<input id="pwLogin" autocomplete="username" required autocapitalize="off" spellcheck="false"></label>
       <label>Пароль<input id="pwPass" type="password" autocomplete="current-password" required></label>
       <label class="check"><input type="checkbox" id="pwRemember"> Запомнить на этом устройстве</label>
+      <p class="muted" style="margin:-4px 0 0;font-size:.85rem">С галочкой кнопки управления появятся и прямо на сайте — на страницах объявлений. Без неё вход действует только в этой вкладке.</p>
       <p class="form-error" id="pwError"></p>
       <button class="btn btn--accent" type="submit">Войти</button>
     </form>
@@ -259,6 +260,6 @@
 <div class="toast" id="toast" hidden></div>
 
 <script src="common.js?v=8"></script>
-<script src="admin.js?v=9"></script>
+<script src="admin.js?v=10"></script>
 </body>
 </html>
