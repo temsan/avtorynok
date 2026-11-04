@@ -9,6 +9,11 @@
   const DB_PATH = 'data/db.json';
   const siteUrl = `https://${REPO.owner}.github.io/${REPO.repo === REPO.owner + '.github.io' ? '' : REPO.repo + '/'}`;
 
+  // Встроенный режим: сайт открывает админку в невидимом фрейме и управляет объявлениями прямо со своих страниц
+  const EMBED = new URLSearchParams(location.search).has('embed') && parent !== window;
+  if (EMBED) document.documentElement.classList.add('embed');
+  const toParent = m => { if (EMBED) parent.postMessage({ ar: 1, ...m }, location.origin); };
+
   let token = sessionStorage.getItem('ar:token') || store.get('ar:token', '');
   let branch = 'main';
   let me = null;
@@ -144,6 +149,7 @@
     $('#login').hidden = true;
     $('#app').hidden = false;
     await reload();
+    if (EMBED) { toParent({ type: 'ready', name: me.as || me.login, branch }); return; }
     loadInbox();
     loadAdmins();
     loadAccounts();
@@ -259,11 +265,28 @@
   });
 
   (async () => {
-    if (!token) { $('#login').hidden = false; return; }
-    busy('Вход…');
-    try { await login(); } catch (e) { $('#login').hidden = false; $('#loginError').textContent = e.message; }
+    if (!token) { $('#login').hidden = false; toParent({ type: 'noauth' }); return; }
+    if (!EMBED) busy('Вход…');
+    try { await login(); } catch (e) { $('#login').hidden = false; $('#loginError').textContent = e.message; toParent({ type: 'noauth' }); }
     finally { busy(); }
   })();
+
+  // Команды от сайта (только с того же адреса)
+  window.addEventListener('message', async e => {
+    if (!EMBED || e.origin !== location.origin || e.source !== parent || !e.data?.ar || !me) return;
+    const { type, id, value } = e.data;
+    try {
+      if (type === 'edit' || type === 'new') {
+        await reload(); // свежая версия из репозитория
+        const l = type === 'edit' ? db.listings.find(x => x.id === id) : null;
+        if (type === 'edit' && !l) throw new Error('Объявление не найдено — возможно, его уже удалили');
+        openEditor(l);
+        toParent({ type: 'opened' });
+      } else if (type === 'status') toParent({ type: 'updated', listing: await setStatus(id, value) });
+      else if (type === 'comments') toParent({ type: 'updated', listing: await setComments(id, value) });
+      else if (type === 'delete') { await removeListing(db.listings.find(x => x.id === id) || (await reload(), db.listings.find(x => x.id === id))); toParent({ type: 'deleted', id }); }
+    } catch (err) { toParent({ type: 'error', message: err.message }); }
+  });
 
   /* ---------- Вкладки ---------- */
   $$('[data-tab]').forEach(b => b.addEventListener('click', () => {
@@ -306,23 +329,37 @@
     const b = e.target.closest('[data-act="edit"]'); if (!b) return;
     openEditor(db.listings.find(l => l.id === b.closest('.row').dataset.id));
   });
+  async function setStatus(id, status) {
+    const before = db.listings.find(l => l.id === id);
+    if (!before || !ENUMS.status[status]) throw new Error('Объявление не найдено');
+    const d = await mutate(`Статус: ${title(before)} → ${ENUMS.status[status]}`, d => {
+      const l = d.listings.find(x => x.id === id); if (l) { l.status = status; l.updated = new Date().toISOString(); }
+    });
+    return d.listings.find(x => x.id === id);
+  }
+  async function setComments(id, on) {
+    const before = db.listings.find(l => l.id === id);
+    if (!before) throw new Error('Объявление не найдено');
+    const issue = await syncDiscussion({ ...before, comments: on }, before);
+    const d = await mutate(`Обсуждение ${on ? 'включено' : 'выключено'}: ${title(before)}`, d => {
+      const l = d.listings.find(x => x.id === id); if (l) { l.comments = on; l.issue = issue; l.updated = new Date().toISOString(); }
+    });
+    return d.listings.find(x => x.id === id);
+  }
+  async function removeListing(l) {
+    if (!l) throw new Error('Объявление не найдено');
+    const files = [...(l.photos || []).filter(p => !/^https?:/.test(p)), ...spinRepoFiles(l.spin)].map(p => ({ path: p, delete: true }));
+    await mutate(`Удалено: ${title(l)}, ${l.year}`, d => { d.listings = d.listings.filter(x => x.id !== l.id); }, files);
+    await closeDiscussion(l.issue);
+  }
+
   $('#rows').addEventListener('change', async e => {
     const el = e.target.closest('[data-act]'); if (!el) return;
     const id = el.closest('.row').dataset.id;
-    const before = db.listings.find(l => l.id === id);
     busy('Сохраняю…');
     try {
-      if (el.dataset.act === 'status') {
-        await mutate(`Статус: ${title(before)} → ${ENUMS.status[el.value]}`, d => {
-          const l = d.listings.find(x => x.id === id); if (l) { l.status = el.value; l.updated = new Date().toISOString(); }
-        });
-      } else {
-        const on = el.checked;
-        const issue = await syncDiscussion({ ...before, comments: on }, before);
-        await mutate(`Обсуждение ${on ? 'включено' : 'выключено'}: ${title(before)}`, d => {
-          const l = d.listings.find(x => x.id === id); if (l) { l.comments = on; l.issue = issue; }
-        });
-      }
+      if (el.dataset.act === 'status') await setStatus(id, el.value);
+      else await setComments(id, el.checked);
       renderRows();
       toast('Сохранено. На сайте обновится через 1–2 минуты.');
     } catch (err) { toast(err.message, true); renderRows(); } finally { busy(); }
@@ -422,7 +459,7 @@
     $('#spinInfo').textContent = info;
     $('#spinDel').hidden = !spec;
   }
-  ed.addEventListener('close', () => { spinView?.destroy(); spinView = null; });
+  ed.addEventListener('close', () => { spinView?.destroy(); spinView = null; toParent({ type: 'closed' }); });
 
   async function videoFrames(file, n, max = 1280) {
     const v = document.createElement('video');
@@ -532,10 +569,13 @@
         await gh(`${R}/issues/${cur.fromIssue.number}`, { method: 'PATCH', body: { state: 'closed', state_reason: 'completed' } });
         loadInbox();
       }
+      toParent({ type: 'updated', listing });
       ed.close();
       renderRows();
-      toast('Сохранено. На сайте изменения появятся через 1–2 минуты — повторно сохранять не нужно.');
-      watchLive(id, listing.updated);
+      if (!EMBED) {
+        toast('Сохранено. На сайте изменения появятся через 1–2 минуты — повторно сохранять не нужно.');
+        watchLive(id, listing.updated);
+      }
     } catch (err) {
       $('#editError').textContent = err.message;
     } finally { busy(); saving = false; submitBtn.disabled = false; }
@@ -560,9 +600,8 @@
     if (!l || !confirm(`Удалить «${title(l)}, ${l.year}» вместе с фото? Это нельзя отменить.`)) return;
     busy('Удаляю…');
     try {
-      const files = [...(l.photos || []).filter(p => !/^https?:/.test(p)), ...spinRepoFiles(l.spin)].map(p => ({ path: p, delete: true }));
-      await mutate(`Удалено: ${title(l)}, ${l.year}`, d => { d.listings = d.listings.filter(x => x.id !== l.id); }, files);
-      await closeDiscussion(l.issue);
+      await removeListing(l);
+      toParent({ type: 'deleted', id: l.id });
       ed.close(); renderRows(); toast('Объявление удалено.');
     } catch (err) { $('#editError').textContent = err.message; } finally { busy(); }
   });

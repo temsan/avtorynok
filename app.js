@@ -19,6 +19,8 @@
     share: '<circle cx="18" cy="5" r="2.5"/><circle cx="6" cy="12" r="2.5"/><circle cx="18" cy="19" r="2.5"/><path d="M8.2 10.8l7.6-4.4M8.2 13.2l7.6 4.4"/>',
     phone: '<path d="M5 3h4l2 5-2.5 1.5a11 11 0 0 0 6 6L16 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 5a2 2 0 0 1 2-2z"/>',
     tg: '<path d="M21 4L3 11l6 2 2 6 3-4 5 4z"/>',
+    plus: '<path d="M12 5v14M5 12h14"/>',
+    edit: '<path d="M4 20h4L19 9l-4-4L4 16z"/><path d="M13.5 6.5l4 4"/>',
     shield: '<path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/><path d="M8.5 12l2.5 2.5 4.5-5"/>',
     photo: '<rect x="3" y="6" width="18" height="14" rx="2"/><circle cx="12" cy="13" r="3.5"/><path d="M8 6l2-3h4l2 3"/>',
     user: '<circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/>',
@@ -73,10 +75,11 @@
     if (!r.ok) throw new Error('Не удалось загрузить объявления');
     return r.text();
   }
-  const visible = data => data.listings.filter(l => l.status !== 'hidden');
+  const visible = data => data.listings.filter(l => ADM.on || l.status !== 'hidden'); // админ видит и скрытые
   fetchDb().then(text => {
     dbText = text; db = JSON.parse(text);
     all = visible(db);
+    if (ADM.on) admBoot();
     setupCatalog();
     render();
     route();
@@ -93,26 +96,123 @@
     try {
       const text = await fetchDb();
       if (text === dbText) return;
-      const prev = new Map(all.map(l => [l.id, JSON.stringify(l)]));
-      const prevSettings = JSON.stringify(db.settings);
-      dbText = text; db = JSON.parse(text); all = visible(db);
-      const settingsChanged = prevSettings !== JSON.stringify(db.settings);
-      const changed = all.filter(l => prev.get(l.id) !== JSON.stringify(l)).length + [...prev.keys()].filter(id => !byId(id)).length;
-      if (!changed && !settingsChanged) return;
-      render(); // каталог и избранное
-      const car = location.hash.match(/^#\/car\/(.+)$/);
-      if (car && car[1] !== '__preview') {
-        const id = decodeURIComponent(car[1]), l = byId(id);
-        if (!l) { toast('Объявление снято с публикации'); location.replace('#/'); return; }
-        // перерисовываем только если поменялось это объявление и человек сейчас не листает фото / не крутит 360°
-        if ((settingsChanged || prev.get(id) !== JSON.stringify(l)) && !$('#lightbox').open && $('#spinBox')?.hidden !== false) {
-          const y = scrollY; renderCar(l); scrollTo({ top: y, behavior: 'instant' });
-          toast('Объявление обновлено');
-        }
-      } else if (location.hash === '#/compare') renderCompare();
-      else if (changed) toast('Объявления обновлены');
-      renderTray();
+      dbText = text;
+      const live = JSON.parse(text);
+      // правки админа, ещё не дошедшие до GitHub Pages, не откатываем
+      for (const [id, mine] of ADM.local) {
+        const i = live.listings.findIndex(x => x.id === id);
+        const caught = mine === null ? i < 0 : i >= 0 && (live.listings[i].updated || '') >= (mine.updated || '');
+        if (caught) { ADM.local.delete(id); toast('Изменения уже видны всем посетителям ✓'); continue; }
+        if (mine === null) live.listings.splice(i, 1);
+        else if (i >= 0) live.listings[i] = mine; else live.listings.unshift(mine);
+      }
+      apply(live, { quiet: false });
     } catch { /* нет сети — попробуем позже */ } finally { refreshing = false; }
+  }
+
+  // Применить новую версию базы и перерисовать то, что сейчас на экране
+  function apply(next, { quiet = true, force = false } = {}) {
+    const prev = new Map(all.map(l => [l.id, JSON.stringify(l)]));
+    const prevSettings = JSON.stringify(db.settings);
+    db = next; all = visible(db);
+    const settingsChanged = prevSettings !== JSON.stringify(db.settings);
+    const changed = all.filter(l => prev.get(l.id) !== JSON.stringify(l)).length + [...prev.keys()].filter(id => !byId(id)).length;
+    if (!changed && !settingsChanged && !force) return;
+    render(); // каталог и избранное
+    const car = location.hash.match(/^#\/car\/(.+)$/);
+    if (car && car[1] !== '__preview') {
+      const id = decodeURIComponent(car[1]), l = byId(id);
+      if (!l) { if (!quiet) toast('Объявление снято с публикации'); location.replace('#/'); return; }
+      // перерисовываем, если поменялось это объявление и человек сейчас не листает фото / не крутит 360°
+      if ((force || settingsChanged || prev.get(id) !== JSON.stringify(l)) && !$('#lightbox').open && $('#spinBox')?.hidden !== false) {
+        const y = scrollY; renderCar(l); scrollTo({ top: y, behavior: 'instant' });
+        if (!quiet) toast('Объявление обновлено');
+      }
+    } else if (location.hash === '#/compare') renderCompare();
+    else if (changed && !quiet) toast('Объявления обновлены');
+    renderTray();
+  }
+
+  /* ---------- Админ прямо на сайте ----------
+     Если на этом устройстве выполнен вход в админку, сайт загружает её в невидимый фрейм
+     и показывает кнопки «Редактировать», статус, обсуждение, «Удалить». Результат сразу
+     применяется на странице; посетители получат его автообновлением, когда GitHub Pages опубликует. */
+  const ADM = { on: false, ready: false, name: '', branch: 'main', frame: null, local: new Map() };
+  try { ADM.on = !!(sessionStorage.getItem('ar:token') || store.get('ar:token', '')); } catch { /* приватный режим */ }
+  const rawUrl = p => `https://raw.githubusercontent.com/${REPO.owner}/${REPO.repo}/${ADM.branch}/${p}`;
+  function admBoot() {
+    const f = document.createElement('iframe');
+    f.src = 'admin.html?embed=1&v=9'; f.className = 'adm-frame'; f.title = 'Редактор объявления'; f.hidden = true;
+    document.body.append(f); ADM.frame = f;
+  }
+  function admBusy(on) { document.documentElement.classList.toggle('adm-busy', on); $$('[data-adm]').forEach(b => (b.disabled = on)); }
+  function admSend(type, id, value) {
+    if (!ADM.ready) return toast('Админ-режим ещё загружается…');
+    admBusy(true);
+    ADM.frame.contentWindow.postMessage({ ar: 1, type, id, value }, location.origin);
+  }
+  function admLocal(id, listing) { // listing = null — удалено
+    ADM.local.set(id, listing);
+    const next = { ...db, listings: db.listings.filter(x => x.id !== id) };
+    if (listing) { const i = db.listings.findIndex(x => x.id === id); next.listings.splice(i < 0 ? 0 : i, 0, listing); }
+    apply(next, { force: true });
+  }
+  window.addEventListener('message', e => {
+    if (e.origin !== location.origin || !ADM.frame || e.source !== ADM.frame.contentWindow || !e.data?.ar) return;
+    const m = e.data;
+    if (m.type === 'ready') {
+      ADM.ready = true; ADM.name = m.name; ADM.branch = m.branch || 'main';
+      document.documentElement.classList.add('is-admin');
+      $('.top__nav')?.insertAdjacentHTML('beforeend', `<button type="button" class="btn btn--sm btn--dark adm-add" data-adm-new title="Новое объявление">${icon('plus')}<span class="lbl">Объявление</span></button>`);
+      apply(db, { force: true });
+    } else if (m.type === 'noauth') {
+      ADM.on = false; ADM.frame.remove(); ADM.frame = null; apply(db, { force: true });
+    } else if (m.type === 'opened') { admBusy(false); ADM.frame.hidden = false; }
+    else if (m.type === 'closed') { ADM.frame.hidden = true; admBusy(false); }
+    else if (m.type === 'updated') {
+      admBusy(false);
+      const isNewOne = !db.listings.some(x => x.id === m.listing.id);
+      admLocal(m.listing.id, m.listing);
+      if (isNewOne) location.hash = '#/car/' + encodeURIComponent(m.listing.id);
+      toast('Сохранено. Посетители увидят через 1–2 минуты — страница у них обновится сама');
+    } else if (m.type === 'deleted') {
+      admBusy(false); admLocal(m.id, null); toast('Объявление удалено');
+    } else if (m.type === 'error') { admBusy(false); ADM.frame.hidden = true; toast(m.message); }
+  });
+  // свежезагруженные фото ещё не опубликованы на сайте — админу показываем их прямо из репозитория
+  document.addEventListener('error', e => {
+    const im = e.target;
+    if (!ADM.on || im.tagName !== 'IMG' || im.dataset.raw) return;
+    const p = im.getAttribute('src');
+    if (/^photos\//.test(p)) { im.dataset.raw = 1; im.src = rawUrl(p); }
+  }, true);
+  document.addEventListener('click', e => {
+    const n = e.target.closest('[data-adm-new]');
+    if (n) { e.preventDefault(); return admSend('new'); }
+    const ed = e.target.closest('[data-adm-edit]');
+    if (ed) { e.preventDefault(); e.stopPropagation(); return admSend('edit', ed.dataset.admEdit); }
+    const b = e.target.closest('button[data-adm]');
+    if (!b) return;
+    const id = b.closest('[data-adm-id]')?.dataset.admId, l = byId(id);
+    if (b.dataset.adm === 'edit') admSend('edit', id);
+    if (b.dataset.adm === 'delete' && l && confirm(`Удалить «${title(l)}, ${l.year}» вместе с фото? Это нельзя отменить.`)) admSend('delete', id);
+  }, true);
+  document.addEventListener('change', e => {
+    const el = e.target.closest('[data-adm]'); if (!el || el.tagName === 'BUTTON') return;
+    const id = el.closest('[data-adm-id]')?.dataset.admId;
+    if (el.dataset.adm === 'status') admSend('status', id, el.value);
+    if (el.dataset.adm === 'comments') admSend('comments', id, el.checked);
+  });
+  function admBar(l) {
+    if (!ADM.ready) return '';
+    return `<div class="admbar" data-adm-id="${esc(l.id)}">
+      <span class="admbar__who">${icon('shield')}Админ · ${esc(ADM.name)}</span>
+      <button type="button" class="btn btn--sm btn--accent" data-adm="edit">${icon('edit')}Редактировать</button>
+      <label class="admbar__ctl">Статус <select data-adm="status" aria-label="Статус">${Object.entries(ENUMS.status).map(([k, v]) => `<option value="${k}" ${l.status === k ? 'selected' : ''}>${v}</option>`).join('')}</select></label>
+      <label class="admbar__ctl"><input type="checkbox" data-adm="comments" ${l.comments !== false ? 'checked' : ''}> Обсуждение</label>
+      <button type="button" class="btn btn--sm btn--ghost admbar__del" data-adm="delete">Удалить</button>
+      ${ADM.local.has(l.id) ? '<span class="admbar__pending">публикуется для посетителей…</span>' : ''}
+    </div>`;
   }
   document.addEventListener('visibilitychange', () => { if (!document.hidden) refresh(); });
   window.addEventListener('online', refresh);
@@ -270,7 +370,7 @@
     const ph = photosOf(l);
     const sold = l.status === 'sold';
     const fav = favs.has(l.id), inCmp = cmp.includes(l.id);
-    const badges = [sold ? '<span class="bdg bdg--sold">Продано</span>' : '', !sold && isNew(l) ? '<span class="bdg bdg--new">Новое</span>' : '', l.owners === 1 ? '<span class="bdg">1 владелец</span>' : '', hasSpin(l) ? '<span class="bdg bdg--360">360°</span>' : ''].join('');
+    const badges = [sold ? '<span class="bdg bdg--sold">Продано</span>' : '', !sold && isNew(l) ? '<span class="bdg bdg--new">Новое</span>' : '', l.owners === 1 ? '<span class="bdg">1 владелец</span>' : '', hasSpin(l) ? '<span class="bdg bdg--360">360°</span>' : '', l.status === 'hidden' ? '<span class="bdg bdg--sold">Скрыто</span>' : ''].join('');
     return `<article class="card${sold ? ' card--sold' : ''}" data-id="${esc(l.id)}">
       <a class="card__link" href="#/car/${encodeURIComponent(l.id)}">
         <div class="card__img" data-photos="${esc(JSON.stringify(ph.slice(0, 5)))}">
@@ -289,6 +389,7 @@
       <div class="card__acts">
         <button type="button" class="card__act${fav ? ' on' : ''}" data-fav="${esc(l.id)}" aria-pressed="${fav}" aria-label="В избранное">${icon('heart')}</button>
         <button type="button" class="card__act${inCmp ? ' on' : ''}" data-cmp="${esc(l.id)}" aria-pressed="${inCmp}" aria-label="Сравнить">${icon('cmp')}</button>
+        ${ADM.ready ? `<button type="button" class="card__act card__act--adm" data-adm-edit="${esc(l.id)}" aria-label="Редактировать">${icon('edit')}</button>` : ''}
       </div>
     </article>`;
   }
@@ -464,6 +565,8 @@
             <button class="icon-btn" data-share title="Поделиться">${icon('share')}</button>
           </div>`}
         </div>
+        ${isPreview ? '' : admBar(l)}
+        ${l.status === 'hidden' ? '<p class="preview-note">Объявление скрыто — посетители его не видят.</p>' : ''}
         ${spin ? `<div class="viewtabs" role="tablist" aria-label="Вид">
           <button type="button" role="tab" data-vt="photo" aria-selected="true">${icon('photo')}Фото · ${n}</button>
           <button type="button" role="tab" data-vt="spin" aria-selected="false" class="viewtabs__360"><b>360°</b>Обзор</button>
@@ -543,7 +646,7 @@
       $('.mosaic', root).hidden = isSpin;
       $$('.mosaic__all', root).forEach(b => (b.hidden = isSpin));
       if ($('#spinNote')) $('#spinNote').hidden = !isSpin;
-      if (isSpin && !spinView) spinView = mountSpin($('#spinBox'), spin);
+      if (isSpin && !spinView) spinView = mountSpin($('#spinBox'), spin, { fallback: ADM.on ? rawUrl : null });
       if (isSpin) $('#spinBox').focus({ preventScroll: true });
     };
     $('#view-car').onclick = e => {

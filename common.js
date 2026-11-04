@@ -115,7 +115,7 @@
   }
   const hasSpin = l => !!(l?.spin && (l.spin.frames?.[0]?.length || (l.spin.dir && l.spin.cols)));
 
-  function mountSpin(root, s, { intro = true } = {}) {
+  function mountSpin(root, s, { intro = true, fallback = null } = {}) {
     const frames = spinFrames(s), rows = frames.length, cols = frames[0].length;
     const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
     let bgSet = false, row = Math.min(s.row || 0, rows - 1), pos = 0, vel = 0, raf = 0, auto = false, touched = false, alive = true, drag = null;
@@ -160,7 +160,10 @@
         if (r === row) draw();
         loadNext();
       };
-      im.onload = () => done(true); im.onerror = () => done(false);
+      im.onload = () => done(true);
+      im.onerror = () => { // запасной адрес (например, кадры ещё не опубликованы на сайте)
+        if (fallback && !im.dataset.fb && !/^(https?:|data:)/.test(frames[r][c])) { im.dataset.fb = 1; im.src = fallback(frames[r][c]); } else done(false);
+      };
       im.src = frames[r][c];
     };
     for (let i = 0; i < 6; i++) loadNext();
