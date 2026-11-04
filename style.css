@@ -423,7 +423,7 @@ body:has(#view-car:not([hidden])) .install { bottom: calc(86px + env(safe-area-i
   body:has(#view-car:not([hidden])) .cmp-tray { bottom: 86px; }
   .lb__nav { display: none; }
 }
-@media (max-width: 420px) { .top .logo__word { display: none; } }
+@media (max-width: 460px) { .top .logo__word { display: none; } }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; transition: none !important; }
 }
@@ -482,3 +482,4 @@ body:has(#view-car:not([hidden])) .install { bottom: calc(86px + env(safe-area-i
 .card__act--adm { color: var(--accent); }
 .adm-add { gap: 6px; }
 @media (max-width: 700px) { .adm-add .lbl { display: none; } .admbar__del { margin-left: 0; } }
+@media (max-width: 560px) { .is-admin .top .logo__word { display: none; } }

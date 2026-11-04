@@ -44,11 +44,12 @@
 
   /* ---------- Кредит ---------- */
   const CREDIT = { down: 0.2, months: 60, rate: 0.199 };
+  const ratePct = +(CREDIT.rate * 100).toFixed(2); // 19.9, а не 19.900000000000002
   const monthly = (price, down = CREDIT.down, months = CREDIT.months, rate = CREDIT.rate) => {
     const P = price * (1 - down), r = rate / 12;
     return P <= 0 ? 0 : Math.round(r ? (P * r) / (1 - Math.pow(1 + r, -months)) : P / months);
   };
-  const creditNote = `Оценка: взнос ${CREDIT.down * 100}%, ${CREDIT.months} мес., ставка ${String(CREDIT.rate * 100).replace('.', ',')}%`;
+  const creditNote = `Оценка: взнос ${Math.round(CREDIT.down * 100)}%, ${CREDIT.months} мес., ставка ${String(ratePct).replace('.', ',')}%`;
 
   /* ---------- Состояние ---------- */
   let db = { settings: {}, listings: [] };
@@ -600,11 +601,11 @@
             <div class="panel calc" id="calc">
               <h3>Кредитный калькулятор</h3>
               <div class="calc__row"><span>Первый взнос</span><b class="num" id="cDownV"></b></div>
-              <input type="range" id="cDown" min="0" max="80" step="5" value="${CREDIT.down * 100}" aria-label="Первый взнос, %">
+              <input type="range" id="cDown" min="0" max="80" step="5" value="${Math.round(CREDIT.down * 100)}" aria-label="Первый взнос, %">
               <div class="calc__row"><span>Срок</span></div>
               <div class="calc__terms" id="cTerms">${[24, 36, 48, 60, 84].map(m => `<button type="button" class="chip" data-m="${m}" aria-pressed="${m === CREDIT.months}">${m / 12} ${plural(m / 12, 'год', 'года', 'лет')}</button>`).join('')}</div>
               <div class="calc__row"><span>Ставка, % годовых</span></div>
-              <input type="number" id="cRate" value="${CREDIT.rate * 100}" min="0" max="60" step="0.1" style="margin-bottom:14px">
+              <input type="number" id="cRate" value="${ratePct}" min="0" max="60" step="0.1" style="margin-bottom:14px">
               <div class="calc__res"><span>Платёж в месяц</span><b class="num" id="cRes"></b></div>
               <small>Расчёт примерный и не является офертой. Условия уточняйте в банке.</small>
             </div>
