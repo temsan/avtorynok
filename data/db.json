@@ -551,8 +551,8 @@
       "brand": "Kia",
       "model": "Sportage",
       "year": 2022,
-      "mileage": 38000,
       "price": 3450000,
+      "mileage": 38000,
       "transmission": "Автомат",
       "fuel": "Бензин",
       "body": "Кроссовер",
@@ -566,12 +566,18 @@
       "city": "Ростов-на-Дону",
       "seller": "Ирина",
       "contact": "@irina_kia",
+      "status": "active",
       "description": "Новое поколение, комплектация Prestige: изогнутый экран, круговой обзор, электропривод багажника. Женщина за рулём, гаражное хранение.",
+      "comments": true,
       "photos": [
         "photos/sportage/1.jpg",
         "photos/sportage/2.jpg",
-        "photos/sportage/3.jpg"
+        "photos/sportage/3.jpg",
+        "photos/sportage-2022/mw37688x-3.jpg"
       ],
+      "created": "2026-11-02T10:00:00.000Z",
+      "updated": "2026-11-05T07:01:31.307Z",
+      "issue": 10,
       "credits": [
         {
           "file": "photos/sportage/1.jpg",
@@ -591,12 +597,7 @@
           "author": "",
           "license": "CC BY-SA 4.0"
         }
-      ],
-      "status": "active",
-      "comments": true,
-      "issue": 10,
-      "created": "2026-11-02T10:00:00.000Z",
-      "updated": "2026-11-02T10:00:00.000Z"
+      ]
     }
   ]
 }
