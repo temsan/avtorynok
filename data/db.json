@@ -23,15 +23,28 @@
       "condition": "Был в ДТП, восстановлен",
       "city": "Санкт-Петербург",
       "seller": "Собственик",
-      "contact": "9062592394",
+      "contact": "+79062592392",
       "status": "active",
-      "description": "Гениратор",
+      "description": "Аукцыон",
       "comments": true,
       "photos": [
-        "photos/hyundai-solaris-2018-7zpm/mw2cqwp9-1.jpg"
+        "photos/hyundai-solaris-2018-7zpm/mw2cqwp9-1.jpg",
+        "photos/hyundai-solaris-2018-7zpm/mw3w86qy-1.jpg",
+        "photos/hyundai-solaris-2018-7zpm/mw3w86qy-2.jpg",
+        "photos/hyundai-solaris-2018-7zpm/mw3w86qy-3.jpg",
+        "photos/hyundai-solaris-2018-7zpm/mw3w86qy-4.jpg",
+        "photos/hyundai-solaris-2018-7zpm/mw3w86qy-5.jpg",
+        "photos/hyundai-solaris-2018-7zpm/mw3w86qy-6.jpg",
+        "photos/hyundai-solaris-2018-7zpm/mw3w86qy-7.jpg",
+        "photos/hyundai-solaris-2018-7zpm/mw3w86qy-8.jpg",
+        "photos/hyundai-solaris-2018-7zpm/mw3w86qy-9.jpg",
+        "photos/hyundai-solaris-2018-7zpm/mw3w86qy-10.jpg",
+        "photos/hyundai-solaris-2018-7zpm/mw3w86qy-11.jpg",
+        "photos/hyundai-solaris-2018-7zpm/mw3w86qy-12.jpg",
+        "photos/hyundai-solaris-2018-7zpm/mw3w86qy-13.jpg"
       ],
       "created": "2026-11-04T16:11:06.184Z",
-      "updated": "2026-11-04T16:56:30.566Z",
+      "updated": "2026-11-05T18:42:53.077Z",
       "issue": 11
     },
     {
