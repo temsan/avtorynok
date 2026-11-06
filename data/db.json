@@ -210,51 +210,6 @@
       }
     },
     {
-      "id": "vesta-2021",
-      "brand": "Lada",
-      "model": "Vesta",
-      "year": 2021,
-      "mileage": 54000,
-      "price": 1150000,
-      "transmission": "Механика",
-      "fuel": "Бензин",
-      "body": "Седан",
-      "engine": 1.6,
-      "power": 106,
-      "drive": "Передний",
-      "wheel": "Левый",
-      "color": "Оранжевый",
-      "owners": 1,
-      "condition": "Не битый",
-      "city": "Самара",
-      "seller": "Дмитрий",
-      "contact": "+7 927 111-22-33",
-      "description": "Комплектация Luxe, мультимедиа, камера заднего вида, подогрев всех сидений и руля. На гарантии до конца года. Не такси, не каршеринг.",
-      "photos": [
-        "photos/vesta/1.jpg",
-        "photos/vesta/2.jpg"
-      ],
-      "credits": [
-        {
-          "file": "photos/vesta/1.jpg",
-          "source": "https://commons.wikimedia.org/wiki/File:Lada_Vesta_(cropped).jpg",
-          "author": "Sergey Rodovnichenko",
-          "license": "CC BY-SA 2.0"
-        },
-        {
-          "file": "photos/vesta/2.jpg",
-          "source": "https://commons.wikimedia.org/wiki/File:Lada_Vesta_Sport_(Lada_Sport).jpg",
-          "author": "",
-          "license": "CC BY-SA 4.0"
-        }
-      ],
-      "status": "active",
-      "comments": true,
-      "issue": 4,
-      "created": "2026-11-01T10:00:00.000Z",
-      "updated": "2026-11-01T10:00:00.000Z"
-    },
-    {
       "id": "polo-2015",
       "brand": "Volkswagen",
       "model": "Polo",
