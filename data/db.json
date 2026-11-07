@@ -266,8 +266,8 @@
       "brand": "BMW",
       "model": "X5",
       "year": 2020,
-      "mileage": 61000,
       "price": 6990000,
+      "mileage": 61000,
       "transmission": "Автомат",
       "fuel": "Дизель",
       "body": "Внедорожник",
@@ -281,12 +281,17 @@
       "city": "Санкт-Петербург",
       "seller": "Максим",
       "contact": "+7 921 777-88-99",
+      "status": "active",
       "description": "xDrive30d M Sport. Пневмоподвеска, панорама, Harman Kardon, проекция, вентиляция сидений. Полная история у дилера, последнее ТО — 2 месяца назад. Возможен обмен.",
+      "comments": true,
       "photos": [
         "photos/x5/1.jpg",
         "photos/x5/2.jpg",
         "photos/x5/3.jpg"
       ],
+      "created": "2026-11-03T10:00:00.000Z",
+      "updated": "2026-11-07T13:10:45.279Z",
+      "issue": 12,
       "credits": [
         {
           "file": "photos/x5/1.jpg",
@@ -306,12 +311,7 @@
           "author": "",
           "license": "CC BY-SA 4.0"
         }
-      ],
-      "status": "active",
-      "comments": true,
-      "issue": 12,
-      "created": "2026-11-03T10:00:00.000Z",
-      "updated": "2026-11-04T17:03:53.985Z"
+      ]
     },
     {
       "id": "jolion-2023",
