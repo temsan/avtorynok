@@ -104,8 +104,8 @@
       "brand": "Kia",
       "model": "Rio",
       "year": 2018,
-      "mileage": 96500,
       "price": 1190000,
+      "mileage": 96500,
       "transmission": "Автомат",
       "fuel": "Бензин",
       "body": "Седан",
@@ -119,12 +119,17 @@
       "city": "Казань",
       "seller": "Ильдар",
       "contact": "@ildar_auto",
+      "status": "sold",
       "description": "Один владелец, покупал новым в салоне. Масло менял каждые 10 тыс. км. Есть небольшой скол на капоте, на фото видно. Зимой хранилась в тёплом паркинге.",
+      "comments": true,
       "photos": [
         "photos/rio/1.jpg",
         "photos/rio/2.jpg",
         "photos/rio/3.jpg"
       ],
+      "created": "2026-11-02T10:00:00.000Z",
+      "updated": "2026-11-07T12:41:12.428Z",
+      "issue": 2,
       "credits": [
         {
           "file": "photos/rio/1.jpg",
@@ -144,12 +149,7 @@
           "author": "",
           "license": "CC BY-SA 4.0"
         }
-      ],
-      "status": "active",
-      "comments": true,
-      "issue": 2,
-      "created": "2026-11-02T10:00:00.000Z",
-      "updated": "2026-11-02T10:00:00.000Z"
+      ]
     },
     {
       "id": "solaris-2016",
